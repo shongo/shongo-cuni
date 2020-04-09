@@ -1,0 +1,121 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<entity-mappings
+        xmlns="http://java.sun.com/xml/ns/persistence/orm"
+        version="2.0">
+
+    <description>Entities which are not defined in the controller module</description>
+
+    <entity class="cz.cesnet.shongo.JadeReport" access="FIELD">
+        <inheritance strategy="SINGLE_TABLE"/>
+        <discriminator-column length="50"/>
+        <attributes>
+            <id name="id">
+                <column column-definition="BIGINT"/>
+                <generated-value strategy="AUTO"/>
+            </id>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$UnknownErrorReport" access="FIELD">
+        <attributes>
+            <basic name="description">
+                <column length="2048"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$AgentNotFoundReport" access="FIELD">
+        <discriminator-value>AgentNotFoundReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$AgentNotStartedReport" access="FIELD">
+        <discriminator-value>AgentNotStartedReport</discriminator-value>
+        <attributes>
+            <basic name="senderAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandAbstractErrorReport" access="FIELD">
+        <discriminator-value>CommandAbstractErrorReport</discriminator-value>
+        <attributes>
+            <basic name="command"/>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandUnknownErrorReport" access="FIELD">
+        <discriminator-value>CommandUnknownErrorReport</discriminator-value>
+        <attributes>
+            <basic name="description">
+                <column length="2048"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandTimeoutReport" access="FIELD">
+        <discriminator-value>CommandTimeoutReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandNotSupportedReport" access="FIELD">
+        <discriminator-value>CommandNotSupportedReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandRefusedReport" access="FIELD">
+        <discriminator-value>CommandRefusedReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandNotUnderstoodReport" access="FIELD">
+        <discriminator-value>CommandNotUnderstoodReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandFailedReport" access="FIELD">
+        <discriminator-value>CommandFailedReport</discriminator-value>
+        <attributes>
+            <basic name="receiverAgent">
+                <column length="64"/>
+            </basic>
+            <basic name="code">
+                <column length="64"/>
+            </basic>
+            <basic name="reason">
+                <column length="2048"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="cz.cesnet.shongo.JadeReportSet$CommandResultDecodingFailedReport" access="FIELD">
+        <discriminator-value>CommandResultDecodingFailedReport</discriminator-value>
+        <attributes>
+            <basic name="senderAgent">
+                <column length="64"/>
+            </basic>
+        </attributes>
+    </entity>
+
+</entity-mappings>

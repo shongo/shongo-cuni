@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="reports">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="scopes" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="scope" type="scope-declaration" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="scope" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="template" type="report" minOccurs="0" maxOccurs="1"/>
+                            <xs:element name="report" type="report" minOccurs="1" maxOccurs="unbounded">
+                                <xs:unique name="ParamUnique">
+                                    <xs:selector xpath="./params/param"/>
+                                    <xs:field xpath="@name"/>
+                                </xs:unique>
+                                <xs:keyref name="ResolutionParamReferrer" refer="ParamUnique">
+                                    <xs:selector xpath="./resolution"/>
+                                    <xs:field xpath="@param"/>
+                                </xs:keyref>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="name" type="xs:string" use="required"/>
+                    </xs:complexType>
+                    <xs:unique name="UniqueScopeReport">
+                        <xs:selector xpath="./report"/>
+                        <xs:field xpath="id"/>
+                    </xs:unique>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="ScopeUnique">
+            <xs:selector xpath="./scopes/scope"/>
+            <xs:field xpath="name"/>
+        </xs:unique>
+        <xs:keyref name="ScopeUsageReferrer" refer="ScopeUnique">
+            <xs:selector xpath="./scope"/>
+            <xs:field xpath="@name"/>
+        </xs:keyref>
+        <xs:unique name="ScopeUsageUnique">
+            <xs:selector xpath="./scope"/>
+            <xs:field xpath="@name"/>
+        </xs:unique>
+    </xs:element>
+
+    <xs:complexType name="scope-declaration">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="module" type="xs:string"/>
+            <xs:element name="class-name" type="xs:string"/>
+            <xs:element name="messages" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="module" type="xs:string"/>
+                        <xs:element name="class-name" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="report-module">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="common"/>
+            <xs:enumeration value="controller"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="report-classification-severity">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="error"/>
+            <xs:enumeration value="warn"/>
+            <xs:enumeration value="info"/>
+            <xs:enumeration value="debug"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="report-param">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="type-key" type="xs:string"/>
+        <xs:attribute name="type-element" type="xs:string"/>
+        <xs:attribute name="resource-id" type="xs:boolean"/>
+    </xs:complexType>
+
+    <xs:complexType name="report-param-temporary">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="report-for">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="domain-admin"/>
+            <xs:enumeration value="resource-admin"/>
+            <xs:enumeration value="user"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="report-message">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="lang" type="xs:string" use="optional"/>
+                <xs:attribute name="for" use="optional">
+                    <xs:simpleType>
+                        <xs:list itemType="report-for" />
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="report-resolution-enum">
+        <xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value=""/>
+                    <xs:enumeration value="try-again"/>
+                    <xs:enumeration value="stop"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
+
+    <xs:complexType name="report-resolution">
+        <xs:simpleContent>
+            <xs:extension base="report-resolution-enum">
+                <xs:attribute name="param" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Name of param from which the resolution is retrieved.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+
+    </xs:complexType>
+
+    <xs:complexType name="report">
+        <xs:annotation>
+            <xs:documentation>
+                Structured message which can be reported in Shongo (e.g., failure or debug information).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Unique string name of the report (use dashes for separating words).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="classification" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies whether the report represents error, warning, information or debug message.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:attribute name="severity" type="report-classification-severity"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="params" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Parameters which can be used to store the report message parts (or another reports).
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="param" type="report-param" maxOccurs="unbounded"/>
+                        <xs:element name="temporary" type="report-param-temporary" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        String description of the report which can contain "${parameter}" variables.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:sequence>
+                <xs:element name="message" type="report-message" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Message which will be displayed to users which can contain "${parameter}" variables.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:element name="example" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Example(s) of the reports.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="visible" minOccurs="0" maxOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction>
+                        <xs:simpleType>
+                            <xs:list itemType="report-for"/>
+                        </xs:simpleType>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="resolution" type="report-resolution" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="api-fault" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies whether report is api fault.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="serializable" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies whether report can serialize it's parameters.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="persistent" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies whether report can be persisted via JPA.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="api-fault-code" type="xs:int" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies code for the API fault.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="exception" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies base exception class which this report exception extends.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                <xs:attribute name="base-class" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Specifies base exception class which this report exception extends.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="runtime" type="xs:boolean">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Specifies whether generated exception for this report should be runtime.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="abstract" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    Specifies whether the report is only abstract super class for other reports and cannot be
+                    instanced inside the Shongo.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="extends" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    Specifies base report id or class which this report extends.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+
+</xs:schema>

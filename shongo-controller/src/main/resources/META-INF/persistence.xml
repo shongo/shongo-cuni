@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+
+    <persistence-unit name="controller">
+
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+        <mapping-file>report-mappings.xml</mapping-file>
+
+        <!-- Include hibernate typedefs from hibernate package -->
+        <class>cz.cesnet.shongo.hibernate</class>
+
+        <!-- Hibernate configuration -->
+        <properties>
+            <!-- Connection -->
+            <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
+            <property name="hibernate.connection.username" value="sa"/>
+            <property name="hibernate.connection.password" value=""/>
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider" />
+            <!-- Other configurations -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.ejb.naming_strategy" value="cz.cesnet.shongo.controller.util.NamingStrategy"/>
+            <!-- C3P0 configuration, see: -->
+            <!--   * org.hibernate.cfg.AvailableSettings -->
+            <!--   * http://www.mchange.com/projects/c3p0/#configuration_properties -->
+            <property name="hibernate.c3p0.timeout" value="0" />
+            <property name="hibernate.c3p0.min_size" value="3" />
+            <property name="hibernate.c3p0.max_size" value="20" />
+            <property name="hibernate.c3p0.acquire_increment" value="3" />
+            <property name="hibernate.c3p0.max_statements" value="100" />
+            <property name="hibernate.c3p0.idle_test_period" value="100" />
+        </properties>
+
+    </persistence-unit>
+
+    <persistence-unit name="persistence-test">
+
+        <class>cz.cesnet.shongo.controller.acl.AclEntry</class>
+        <class>cz.cesnet.shongo.controller.acl.AclIdentity</class>
+        <class>cz.cesnet.shongo.controller.acl.AclObjectClass</class>
+        <class>cz.cesnet.shongo.controller.acl.AclObjectIdentity</class>
+        <class>cz.cesnet.shongo.controller.authorization.AclEntryDependency</class>
+
+        <!-- Hibernate configuration -->
+        <properties>
+            <!-- Connection -->
+            <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
+            <property name="hibernate.connection.username" value="sa"/>
+            <property name="hibernate.connection.password" value=""/>
+            <!-- Other configurations -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.ejb.naming_strategy" value="cz.cesnet.shongo.controller.util.NamingStrategy"/>
+            <property name="hibernate.archive.autodetection" value="false"/>
+        </properties>
+
+    </persistence-unit>
+
+
+</persistence>

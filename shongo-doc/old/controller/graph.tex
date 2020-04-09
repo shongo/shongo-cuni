@@ -1,0 +1,117 @@
+\usepackage{ifthen}
+
+% Draw vertex (node, position, title)
+\newcommand{\Vertex}[3]{\node[vertex] (#2) at (#1)  {#3};}
+
+% Draw edge (type, styles, from, to)  
+\newcounter{EdgeCount}      
+\newcommand{\Edge}[4]{
+    % Count edges
+    \setcounter{EdgeCount}{0}
+    \foreach \x in{#2}{
+        \stepcounter{EdgeCount}
+    }    
+
+    % Determine edges starting bend ratio
+    \def\EdgeCountOriginal{\arabic{EdgeCount}}
+    \def\EdgeCountEven{\the\numexpr((\value{EdgeCount}-1)/2)*2\relax}    
+    \if\EdgeCountOriginal\EdgeCountEven
+       % For even edges count
+       \def\EdgeBegin{\the\numexpr5-((\value{EdgeCount}-1)/2)*10\relax}
+    \else
+       % For odd edges count
+       \def\EdgeBegin{\the\numexpr0-((\value{EdgeCount}-1)/2)*10\relax}
+    \fi
+
+    % Determine edge arrow style    
+    \def\EdgeType{-}
+    \ifthenelse{\equal{#1}{<->}}{\def\EdgeType{latex-latex}}{}
+    \ifthenelse{\equal{#1}{->}}{\def\EdgeType{-latex}}{}
+    \ifthenelse{\equal{#1}{<-}}{\def\EdgeType{latex-}}{}
+       
+    % Draw edges
+    \foreach \EdgeStyle [count=\EdgeStyleIndex] in{#2}{
+      \draw [
+        \EdgeType, 
+        edge,
+        \EdgeStyle, 
+        bend left=\the\numexpr\EdgeBegin+(\EdgeStyleIndex - 1)*10\relax
+      ] (#3) edge (#4);
+    }
+}
+
+% Draw all edges between the nodes (type, styles, all)
+\newcommand{\EdgeAllToAll}[3] {
+  \foreach \EdgeNodeFrom [count=\EdgeNodeFromIndex] in{#3}{
+    \foreach \EdgeNodeTo [count=\EdgeNodeToIndex] in{#3}{
+      \ifthenelse{\EdgeNodeToIndex > \EdgeNodeFromIndex}{
+        \Edge{#1}{#2}{\EdgeNodeFrom}{\EdgeNodeTo}        
+      }{}
+    } 
+  }
+}
+
+% Draw all edges between the nodes (type, styles, one, all)
+\newcommand{\EdgeOneToAll}[4] {
+  \foreach \EdgeNodeTo in{#4}{
+    \Edge{#1}{#2}{#3}{\EdgeNodeTo}
+    
+  }
+}
+
+% Legend (position)
+\newenvironment{GraphLegend}[1]{
+  \begin{pgfinterruptboundingbox}
+  \node (legend) at ($(#1) + (0, 0.25)$) {};
+  \end{pgfinterruptboundingbox}
+}{
+}
+
+% Legend Item (style, title)
+\newcommand{\GraphLegendItem}[2]{  
+  \node (legend) at ($(legend) + (0, -0.5)$) {};
+  \draw [#1, line width=1.5pt]  (legend) --++ (-0.9, 0);
+  \node[right, font=\footnotesize] at (legend)  {#2};
+}
+
+% Draw subgraph (position, title)
+\newenvironment{SubGraph}[2]{%
+  \begin{pgfinterruptboundingbox} 
+  \begin{scope}[shift={(#1)}]  
+  \providecommand{\tmpSubGraphArgTwo}{#2}%
+}{%
+  \ifthenelse{\equal{\tmpSubGraphArgTwo}{}}
+  {
+    \coordinate (tmpNE) at (current bounding box.north east); 
+    \coordinate (tmpSW) at (current bounding box.south west);   
+  }{
+    \coordinate (tmpNorth) at ($(current bounding box.north) + (0,0.4)$); 
+    \coordinate (tmpNE) at ($(current bounding box.north east) + (0.2,0.2)$); 
+    \coordinate (tmpSW) at ($(current bounding box.south west) - (0.2,0.2)$);   
+    \draw[dashed] (tmpNE) rectangle (tmpSW);
+    \node at (tmpNorth) {\tmpSubGraphArgTwo};
+  }
+  \end{scope}
+  \end{pgfinterruptboundingbox}  
+  \useasboundingbox (tmpNE) rectangle (tmpSW); 
+}
+
+
+% Draw graph figure (label, title)
+\newenvironment{Graph}[2]{%
+  \begin{figure}[ht!]%
+  \providecommand{\tmpArgFirst}{#1}%
+  \providecommand{\tmpArgSecond}{#2}%
+  \begin{center}%
+  \begin{tikzpicture}%
+    \tikzstyle{every node}=[font=\footnotesize]%
+    \tikzstyle{vertex}=[draw=black, inner sep=8pt]%
+    \tikzstyle{edge}=[line width=0.7pt]%
+}{%
+  \end{tikzpicture}
+  \end{center}
+  \vspace*{-4mm}
+  \caption{\tmpArgSecond}
+  \label{\tmpArgFirst}
+  \end{figure}
+}

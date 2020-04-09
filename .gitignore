@@ -1,0 +1,9 @@
+.idea-data
+.idea
+*.iml
+.jade
+log/
+target/
+*.fsps
+*.class
+.gitattributes

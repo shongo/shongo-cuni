@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+    <!-- Resources/Views without security (if a JSP match then <security:authorize/> won't be available) -->
+    <security:http pattern="/favicon.ico" security="none"/>
+    <security:http pattern="/apple-touch-icon*.png" security="none"/>
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/fonts/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/js/**" security="none"/>
+    <security:http pattern="/design/**" security="none"/>
+
+    <!-- Configure security for OpenID Connect -->
+    <!-- Based on https://github.com/mitreid-connect/OpenID-Connect-Java-Spring-Server/tree/master/openid-connect-client -->
+    <security:http pattern="/**"
+                   entry-point-ref="authenticationEntryPoint"
+                   use-expressions="true"
+                   disable-url-rewriting="true">
+
+        <!--Following pages don't need login -->
+        <security:intercept-url pattern="/" access="permitAll()"/>
+        <security:intercept-url pattern="/layout" access="permitAll()"/>
+        <security:intercept-url pattern="/development" access="permitAll()"/>
+        <security:intercept-url pattern="/help" access="permitAll()"/>
+        <security:intercept-url pattern="/changelog" access="permitAll()"/>
+        <security:intercept-url pattern="/login*" access="permitAll()"/>
+        <security:intercept-url pattern="/logged" access="permitAll()"/>
+        <security:intercept-url pattern="/report" access="permitAll()"/>
+        <security:intercept-url pattern="/report/submit" access="permitAll()"/>
+        <security:intercept-url pattern="/error/submit" access="permitAll()"/>
+        <security:intercept-url pattern="/meeting-room-ics/**" access="permitAll()"/>
+
+        <!-- Other pages need login -->
+        <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+        <!-- Configure OpenID Connect authentication filter -->
+        <security:custom-filter before="PRE_AUTH_FILTER" ref="authenticationFilter"/>
+
+        <!-- Configure logout -->
+        <security:logout logout-url="/logout" invalidate-session="true"/>
+
+        <!-- Configure expression handler to use custom permission evaluator -->
+        <security:expression-handler ref="expressionHandler"/>
+
+    </security:http>
+
+    <!-- Configure authentication manager for OpenID Connect -->
+    <security:authentication-manager alias="authenticationManager">
+        <!-- Use authentication provider for OpenID Connect -->
+        <security:authentication-provider ref="authenticationProvider"/>
+    </security:authentication-manager>
+
+    <!-- Create expression handler with custom permission evaluator -->
+    <bean id="expressionHandler" class="cz.cesnet.shongo.client.web.auth.WebSecurityExpressionHandler">
+        <property name="permissionEvaluator" ref="permissionEvaluator"/>
+    </bean>
+
+    <!-- Create authentication entry-point -->
+    <bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint">
+        <constructor-arg>
+            <map>
+                <entry>
+                    <key>
+                        <bean class="cz.cesnet.shongo.client.web.auth.AjaxRequestMatcher"/>
+                    </key>
+                    <bean class="cz.cesnet.shongo.client.web.auth.Http401UnauthorizedEntryPoint"/>
+                </entry>
+            </map>
+        </constructor-arg>
+        <property name="defaultEntryPoint">
+            <bean class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+                <constructor-arg value="/login"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Create authentication filter for OpenID Connect -->
+    <bean id="authenticationFilter"
+          class="cz.cesnet.shongo.client.web.auth.OpenIDConnectAuthenticationFilter">
+        <constructor-arg ref="configuration"/>
+        <constructor-arg ref="controllerAuthorizationService"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <property name="defaultFailureUrl" value="/login-error"/>
+                <property name="useForward" value="true"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Create authentication provider for OpenID Connect -->
+    <bean id="authenticationProvider" class="cz.cesnet.shongo.client.web.auth.OpenIDConnectAuthenticationProvider">
+        <constructor-arg ref="configuration"/>
+    </bean>
+
+</beans>

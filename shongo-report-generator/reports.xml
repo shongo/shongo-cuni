@@ -1,0 +1,1862 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<reports xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="reports.xsd">
+
+    <scopes>
+        <scope>
+            <name>jade</name>
+            <module>common-api</module>
+            <class-name>cz.cesnet.shongo.JadeReportSet</class-name>
+        </scope>
+
+        <scope>
+            <name>common</name>
+            <module>common-api</module>
+            <class-name>cz.cesnet.shongo.CommonReportSet</class-name>
+        </scope>
+
+        <scope>
+            <name>controller</name>
+            <module>controller-api</module>
+            <class-name>cz.cesnet.shongo.controller.ControllerReportSet</class-name>
+        </scope>
+
+        <scope>
+            <name>scheduler</name>
+            <module>controller</module>
+            <class-name>cz.cesnet.shongo.controller.scheduler.SchedulerReportSet</class-name>
+            <messages>
+                <module>controller-api</module>
+                <class-name>cz.cesnet.shongo.controller.AllocationStateReportMessages</class-name>
+            </messages>
+        </scope>
+
+        <scope>
+            <name>executor</name>
+            <module>controller</module>
+            <class-name>cz.cesnet.shongo.controller.executor.ExecutionReportSet</class-name>
+            <messages>
+                <module>controller-api</module>
+                <class-name>cz.cesnet.shongo.controller.ExecutionReportMessages</class-name>
+            </messages>
+        </scope>
+    </scopes>
+
+    <scope name="jade">
+
+        <template extends="cz.cesnet.shongo.JadeReport">
+            <serializable>true</serializable>
+            <exception base-class="cz.cesnet.shongo.JadeException"/>
+        </template>
+
+        <report>
+            <id>unknown-error</id>
+            <classification severity="error"/>
+            <params>
+                <param name="description" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Unknown error: ${description}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report>
+            <id>agent-not-found</id>
+            <classification severity="error"/>
+            <params>
+                <param name="receiverAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Receiver agent ${receiverAgent} is not available now.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>try-again</resolution>
+        </report>
+
+        <report>
+            <id>agent-not-started</id>
+            <classification severity="error"/>
+            <params>
+                <param name="senderAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Sender agent ${senderAgent} is not started yet.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>try-again</resolution>
+        </report>
+
+        <report abstract="true">
+            <id>command-abstract-error</id>
+            <classification severity="error"/>
+            <params>
+                <param name="command" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Abstract command error.
+            </message>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-unknown-error</id>
+            <params>
+                <param name="description" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Unknown error in command ${command}: ${description}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-timeout</id>
+            <params>
+                <param name="receiverAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Command ${command} send to ${receiverAgent} has timeout.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>try-again</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-not-supported</id>
+            <params>
+                <param name="receiverAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Receiver agent ${receiverAgent} doesn't implement command ${command}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-refused</id>
+            <params>
+                <param name="receiverAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Receiver agent ${receiverAgent} has refused command ${command}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-not-understood</id>
+            <params>
+                <param name="receiverAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Receiver agent ${receiverAgent} didn't understand command ${command}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-failed</id>
+            <classification severity="error"/>
+            <params>
+                <param name="receiverAgent" type="String"/>
+                <param name="code" type="String"/>
+                <param name="reason" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Receiver agent ${receiverAgent} failed to perform command ${command}: ${reason}
+            </message>
+            <message for="user">
+                ${reason}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+        <report extends="command-abstract-error">
+            <id>command-result-decoding-failed</id>
+            <classification severity="error"/>
+            <params>
+                <param name="senderAgent" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Sender agent ${senderAgent} cannot decode response from command ${command}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>stop</resolution>
+        </report>
+
+    </scope>
+
+    <scope name="common">
+
+        <template>
+            <api-fault>true</api-fault>
+            <api-fault-code>0</api-fault-code>
+            <exception runtime="true"/>
+        </template>
+
+        <report>
+            <id>unknown-error</id>
+            <classification severity="error"/>
+            <params>
+                <param name="description" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Unknown error: ${description}
+            </message>
+            <message for="user">Unknown error.</message>
+            <example>
+                TODO:
+            </example>
+            <visible>domain-admin user</visible>
+        </report>
+
+        <report>
+            <id>type-mismatch</id>
+            <classification severity="error"/>
+            <params>
+                <param name="requiredType" type="String"/>
+                <param name="presentType" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Type mismatch. Present type ${presentType} doesn't match required type ${requiredType}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>type-illegal-value</id>
+            <classification severity="error"/>
+            <params>
+                <param name="type" type="String"/>
+                <param name="value" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value ${value} is illegal for type ${type}.
+            </message>
+            <example>
+                TODO:
+                -Enum
+                -Date/Time
+                -Period
+                -Interval
+                -Partial Date/Time
+                -DeviceResource.Mode
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>value-maximum-length-exceeded</id>
+            <classification severity="error"/>
+            <params>
+                <param name="value" type="String"/>
+                <param name="maximumLength" type="Integer"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value '${value}' exceeds the maximum length ${maximumLength}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-undefined</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Class ${class} is not defined.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-instantiation-error</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Class ${class} cannot be instanced.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-attribute-undefined</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="attribute" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Attribute ${attribute} is not defined in class ${class}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-attribute-type-mismatch</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="attribute" type="String"/>
+                <param name="requiredType" type="String"/>
+                <param name="presentType" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Type mismatch of value in attribute ${attribute} in class ${class}.
+                Present type ${presentType} doesn't match required type ${requiredType}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-attribute-required</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="attribute" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Attribute ${attribute} in class ${class} wasn't present but it is required.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-attribute-value-maximum-length-exceeded</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="attribute" type="String"/>
+                <param name="maximumLength" type="Integer"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value for attribute ${attribute} in class ${class} exceeds the maximum length ${maximumLength}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-attribute-readonly</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="attribute" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value for attribute ${attribute} in class ${class} was present but the attribute is read-only.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>class-collection-required</id>
+            <classification severity="error"/>
+            <params>
+                <param name="class" type="String"/>
+                <param name="collection" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Collection ${collection} in class ${class} wasn't present or was empty but it is required.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>collection-item-null</id>
+            <classification severity="error"/>
+            <params>
+                <param name="collection" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Null item cannot be present in collection ${collection}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>collection-item-type-mismatch</id>
+            <classification severity="error"/>
+            <params>
+                <param name="collection" type="String"/>
+                <param name="requiredType" type="String"/>
+                <param name="presentType" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Collection ${collection} contains item of type ${presentType} which doesn't match the
+                required type ${requiredType}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>object-not-exists</id>
+            <classification severity="error"/>
+            <params>
+                <param name="objectType" type="String"/>
+                <param name="objectId" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Object ${objectType} with identifier ${objectId} doesn't exist.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>object-invalid</id>
+            <classification severity="error"/>
+            <params>
+                <param name="objectId" type="String"/>
+                <param name="reason" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Object ${objectId} validation failed: ${reason}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>object-not-deletable-referenced</id>
+            <classification severity="error"/>
+            <params>
+                <param name="objectType" type="String"/>
+                <param name="objectId" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Object ${objectType} with identifier ${objectId} cannot be deleted because it is still referenced.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>method-not-defined</id>
+            <classification severity="error"/>
+            <params>
+                <param name="method" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Method ${method} is not defined.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+    </scope>
+
+    <scope name="controller">
+
+        <template>
+            <api-fault>true</api-fault>
+            <api-fault-code>100</api-fault-code>
+            <exception runtime="true"/>
+        </template>
+
+        <report>
+            <id>user-not-exists</id>
+            <classification severity="error"/>
+            <params>
+                <param name="user" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                User ${user} doesn't exist.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>group-not-exists</id>
+            <classification severity="error"/>
+            <params>
+                <param name="group" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Group ${group} doesn't exist.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>group-already-exists</id>
+            <classification severity="error"/>
+            <params>
+                <param name="group" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Group ${group} already exists.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>user-already-in-group</id>
+            <classification severity="error"/>
+            <params>
+                <param name="group" type="String"/>
+                <param name="user" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                User ${user} is already in group ${group}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>user-not-in-group</id>
+            <classification severity="error"/>
+            <params>
+                <param name="group" type="String"/>
+                <param name="user" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                User ${user} isn't in group ${group}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>acl-invalid-object-role</id>
+            <classification severity="error"/>
+            <params>
+                <param name="objectType" type="String"/>
+                <param name="role" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                ACL role ${role} is invalid for object ${objectType}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>security-missing-token</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Security token is missing but is required.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>domain-admin user</visible>
+        </report>
+
+        <report>
+            <id>security-invalid-token</id>
+            <classification severity="error"/>
+            <params>
+                <param name="token" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Invalid security token ${token}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>domain-admin user</visible>
+        </report>
+
+        <report>
+            <id>security-not-authorized</id>
+            <classification severity="error"/>
+            <params>
+                <param name="action" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                You are not authorized to ${action}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>device-command-failed</id>
+            <classification severity="error"/>
+            <params>
+                <param name="device" type="String" resource-id="true"/>
+                <param name="command" type="String"/>
+                <param name="jadeReport" type="JadeReport"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Command ${command} for device ${device} failed: ${jadeReportMessage(jadeReport)}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>domain-admin resource-admin user</visible>
+        </report>
+
+        <report>
+            <id>identifier-invalid</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Identifier ${id} is invalid.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>identifier-invalid-domain</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+                <param name="requiredDomain" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Identifier ${id} doesn't belong to domain ${requiredDomain}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>identifier-invalid-type</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+                <param name="requiredType" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Identifier ${id} isn't of required type ${requiredType}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-not-modifiable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} cannot be modified.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-not-deletable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} cannot be deleted.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-not-revertible</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} cannot be reverted.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-already-modified</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} has already been modified.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-deleted</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} is deleted.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-empty-duration</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request time slot must not be empty.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-not-reusable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reservation request with identifier ${id} cannot be reused.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>executable-invalid-configuration</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+                <param name="configuration" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Configuration ${configuration} is invalid for executable with identifier ${id}.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>executable-not-recordable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Executable with identifier ${id} isn't recordable.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>executable-not-reusable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="id" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Executable with identifier ${id} cannot be reused.
+            </message>
+            <visible>user</visible>
+        </report>
+
+    </scope>
+
+    <scope name="scheduler">
+
+        <template extends="cz.cesnet.shongo.controller.scheduler.SchedulerReport">
+            <visible>domain-admin</visible>
+            <persistent>true</persistent>
+            <exception base-class="cz.cesnet.shongo.controller.scheduler.SchedulerException"/>
+        </template>
+
+        <!--
+          - RESOURCE
+          -->
+
+        <report extends="resource">
+            <id>user-not-allowed</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                User does not have permissions for the resource ${resource.id}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>resource-not-found</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                No resource was found.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>resource</id>
+            <classification severity="info"/>
+            <params>
+                <param name="resource" type="Resource"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message lang="en">
+                Resource ${resource.id}.
+            </message>
+        </report>
+
+        <report extends="resource">
+            <id>resource-not-allocatable</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message lang="en">
+                The resource ${resource.id} is disabled for allocation.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-already-allocated</id>
+            <classification severity="error"/>
+            <params>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} is already allocated in the time slot ${interval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-under-maintenance</id>
+            <classification severity="error"/>
+            <params>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                There is no available capacity due to maintenance in the time slot ${interval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-not-available</id>
+            <classification severity="error"/>
+            <params>
+                <param name="maxDateTime" type="DateTime"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} is not available for the requested time slot.
+                The maximum date/time for which the resource can be allocated is ${maxDateTime}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-room-capacity-exceeded</id>
+            <classification severity="error"/>
+            <params>
+                <param name="availableLicenseCount" type="Integer"/>
+                <param name="maxLicenseCount" type="Integer"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} has available only ${availableLicenseCount} from ${maxLicenseCount} licenses.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-recording-capacity-exceeded</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} doesn't have any available licenses for recording.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-not-endpoint</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} is not endpoint.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>resource-multiple-requested</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The resource ${resource.id} is requested multiple times.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>endpoint-not-found</id>
+            <classification severity="error"/>
+            <params>
+                <param name="technologies" type="Set" type-element="Technology"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                No available endpoint was found for the following specification:
+                  Technologies: ${technologies}
+            </message>
+            <visible>user</visible>
+        </report>
+
+
+        <!--
+          - EXECUTABLE
+          -->
+
+        <report>
+            <id>executable-reusing</id>
+            <classification severity="info"/>
+            <params>
+                <param name="executable" type="Executable"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reusing existing ${executable}.
+            </message>
+        </report>
+
+        <report>
+            <id>room-executable-not-exists</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Room executable doesn't exist.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>executable-invalid-slot</id>
+            <classification severity="error"/>
+            <params>
+                <param name="executable" type="Executable"/>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Requested time slot doesn't correspond to ${interval} from reused executable ${executable}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>executable-already-used</id>
+            <classification severity="error"/>
+            <params>
+                <param name="executable" type="Executable"/>
+                <param name="usageReservationRequest" type="AbstractReservationRequest"/>
+                <param name="usageInterval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reused executable ${executable} is not available because
+                it's already used in reservation request ${usageReservationRequest}
+                for ${usageInterval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <!--
+          - COMPARTMENT
+          -->
+
+        <report>
+            <id>compartment-not-enough-endpoint</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Not enough endpoints are requested for the compartment.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>compartment-assign-alias-to-external-endpoint</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Cannot assign alias to allocated external endpoint.
+            </message>
+            <visible>user</visible>
+        </report>
+
+
+        <!--
+          - CONNECTION between two endpoints
+          -->
+
+        <report abstract="true">
+            <id>connection</id>
+            <params>
+                <param name="endpointFrom" type="Endpoint"/>
+                <param name="endpointTo" type="Endpoint"/>
+            </params>
+        </report>
+
+        <report extends="connection">
+            <id>connection-between</id>
+            <classification severity="info"/>
+            <params>
+                <param name="technology" type="Technology"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Creating connection between ${endpointFrom} and ${endpointTo} in technology ${technology}.
+            </message>
+        </report>
+
+        <report extends="connection">
+            <id>connection-from-to</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Creating connection from ${endpointFrom} to ${endpointTo}.
+            </message>
+        </report>
+
+        <report extends="connection">
+            <id>connection-to-multiple</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Cannot create connection from ${endpointFrom} to ${endpointTo},
+                because the target represents multiple endpoints (not supported yet).
+            </message>
+        </report>
+
+
+        <!--
+          - RESERVATION REQUEST
+          -->
+
+        <report>
+            <id>reservation-request-invalid-slot</id>
+            <classification severity="error"/>
+            <params>
+                <param name="reservationRequest" type="AbstractReservationRequest"/>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Requested time slot doesn't correspond to ${interval} from reused reservation request ${reservationRequest}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-denied</id>
+            <classification severity="info"/>
+            <params>
+                <param name="deniedBy" type="String"/>
+                <param name="reason" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The reservation request has been denied by resource owner ${deniedBy}.
+                Reason: ${reason}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reservation-request-denied-already-allocated</id>
+            <classification severity="info"/>
+            <params>
+                <param name="resource" type="Resource"/>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The reservation request has been denied.
+                Reason: The resource ${resource.id} is already allocated in interval ${interval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <!--
+          - RESERVATION
+          -->
+
+        <report>
+            <id>reservation-without-mandatory-usage</id>
+            <classification severity="error"/>
+            <params>
+                <param name="reservationRequest" type="AbstractReservationRequest"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reused reservation request ${reservationRequest} is mandatory but wasn't used.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report abstract="true">
+            <id>reservation</id>
+            <params>
+                <param name="reservation" type="Reservation"/>
+            </params>
+        </report>
+
+        <report extends="reservation">
+            <id>reservation-already-used</id>
+            <classification severity="error"/>
+            <params>
+                <param name="reservationRequest" type="AbstractReservationRequest"/>
+                <param name="usageReservationRequest" type="AbstractReservationRequest"/>
+                <param name="usageInterval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reused reservation request ${reservationRequest} is not available because it's
+                reservation ${reservation} is already used in reservation request ${usageReservationRequest}
+                for ${usageInterval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="reservation">
+            <id>reservation-reusing</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reusing ${reservation}.
+            </message>
+        </report>
+
+
+        <!--
+          - VALUE
+          -->
+
+        <report>
+            <id>value-already-allocated</id>
+            <classification severity="error"/>
+            <params>
+                <param name="value" type="String"/>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value ${value} is already allocated in interval ${interval}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>value-invalid</id>
+            <classification severity="error"/>
+            <params>
+                <param name="value" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Value ${value} is invalid.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>value-not-available</id>
+            <classification severity="error"/>
+            <params>
+                <param name="interval" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                No value is available.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <!--
+          - EXECUTABLE SERVICES
+          -->
+
+        <report>
+            <id>executable-service-invalid-slot</id>
+            <classification severity="error"/>
+            <params>
+                <param name="executableSlot" type="Interval"/>
+                <param name="serviceSlot" type="Interval"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Requested service slot ${serviceSlot} is outside the executable slot ${executableSlot}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>room-endpoint-always-recordable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="roomEndpointId" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Recording service cannot be allocated for the room endpoint ${roomEndpointId} because it is always recordable.
+            </message>
+            <visible>user</visible>
+        </report>
+
+
+
+        <!--
+          - ALLOCATING reports
+          -->
+
+        <report extends="resource">
+            <id>allocating-resource</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating the resource ${resource.id}.
+            </message>
+        </report>
+
+        <report>
+            <id>allocating-alias</id>
+            <classification severity="info"/>
+            <params>
+                <param name="technologies" type="Set" type-element="Technology"/>
+                <param name="aliasTypes" type="Set" type-element="AliasType"/>
+                <param name="value" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating alias for the following specification:
+                \n  Technology: ${ifEmpty(technologies, "Any")}
+                \n  Alias Type: ${ifEmpty(aliasTypes, "Any")}
+                \n       Value: ${ifEmpty(value, "Any")}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report extends="resource">
+            <id>allocating-value</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating value in the resource ${resource.id}.
+            </message>
+        </report>
+
+        <report>
+            <id>allocating-room</id>
+            <classification severity="info"/>
+            <params>
+                <param name="technologySets" type="List" type-element="TechnologySet"/>
+                <param name="participantCount" type="Integer"/>
+                <param name="resource" type="Resource"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating room for the following specification:
+                \n    Technology: ${technologySets}
+                \n  Participants: ${participantCount}
+                \n      Resource: ${resource.id}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>allocating-recording-service</id>
+            <classification severity="info"/>
+            <params>
+                <param name="enabled" type="Boolean"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating recording service for the following specification:
+                \n    Enabled: ${enabled}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>allocating-compartment</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating compartment.
+            </message>
+        </report>
+
+        <report>
+            <id>allocating-executable</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Allocating executable.
+            </message>
+        </report>
+
+
+        <!--
+          - INFORMATION reports
+          -->
+
+        <report>
+            <id>specification-checking-availability</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Checking specification availability report.
+            </message>
+        </report>
+
+        <report>
+            <id>finding-available-resource</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Finding available resource.
+            </message>
+        </report>
+
+        <report>
+            <id>sorting-resources</id>
+            <classification severity="info"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Sorting resources.
+            </message>
+        </report>
+
+        <report>
+            <id>colliding-reservations</id>
+            <classification severity="info"/>
+            <params>
+                <param name="reservations" type="Map" type-key="String" type-element="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The following reservations are colliding, trying to reallocate them: ${format(reservations, "\n-$key ($value)", "")}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reallocating-reservation-requests</id>
+            <classification severity="info"/>
+            <params>
+                <param name="reservationRequests" type="List" type-element="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The following reservation requests will be reallocated: ${format(reservationRequests, "\n-$value", "")}
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>reallocating-reservation-request</id>
+            <classification severity="info"/>
+            <params>
+                <param name="reservationRequest" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Reallocating reservation request ${reservationRequest}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+
+        <!--
+          - ERROR reports
+          -->
+
+        <report>
+            <id>specification-not-ready</id>
+            <classification severity="error"/>
+            <params>
+                <param name="specification" type="Specification"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Specification ${specification} is not ready.
+            </message>
+        </report>
+
+        <report>
+            <id>specification-not-allocatable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="specification" type="Specification"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                The specification ${specification} is not supposed to be allocated.
+            </message>
+        </report>
+
+        <report>
+            <id>maximum-duration-exceeded</id>
+            <classification severity="error"/>
+            <params>
+                <param name="duration" type="Period"/>
+                <param name="maxDuration" type="Period"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Duration ${duration} is longer than maximum ${maxDuration}.
+            </message>
+            <visible>user</visible>
+        </report>
+
+        <report>
+            <id>user-not-owner</id>
+            <classification severity="error"/>
+            <description>
+                TODO:
+            </description>
+            <message>
+                User is not resource owner.
+            </message>
+        </report>
+
+    </scope>
+
+    <scope name="executor">
+
+        <template extends="cz.cesnet.shongo.controller.executor.ExecutionReport">
+            <visible>domain-admin resource-admin</visible>
+            <persistent>true</persistent>
+        </template>
+
+        <report>
+            <id>command-failed</id>
+            <classification severity="error"/>
+            <params>
+                <param name="command" type="String"/>
+                <param name="jadeReport" type="JadeReport"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Command ${command} failed: ${jadeReportMessage(jadeReport)}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution param="jadeReport"/>
+        </report>
+
+        <report>
+            <id>recording-unavailable</id>
+            <classification severity="error"/>
+            <params>
+                <param name="reason" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                ${reason}
+            </message>
+            <example>
+                TODO:
+            </example>
+            <visible>none</visible>
+            <resolution>try-again</resolution>
+        </report>
+
+        <report>
+            <id>room-not-started</id>
+            <classification severity="error"/>
+            <params>
+                <param name="roomName" type="String"/>
+            </params>
+            <description>
+                TODO:
+            </description>
+            <message>
+                Cannot modify room ${roomName}, because it has not been started yet.
+            </message>
+            <example>
+                TODO:
+            </example>
+            <resolution>try-again</resolution>
+        </report>
+
+    </scope>
+
+</reports>

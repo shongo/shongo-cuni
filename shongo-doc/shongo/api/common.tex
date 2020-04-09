@@ -1,0 +1,195 @@
+\chapter{Common Data Types}
+
+\input{commands}
+
+In this chapter common atomic types, enum types and object classes for Shongo API are described.
+
+\section{Failure Related}
+
+Each failure in API is reported by \textbf{fault code} (number value) and \textbf{fault string} (description text). List of common faults:
+
+\newcommand{\fault}[3]{#1 & #2 & #3 \\ \hline}
+\begin{longtable}{|r|p{5cm}|p{7.5cm}|}
+\hline
+\textbf{\multirow{2}{*}{\centering\begin{minipage}{8mm}fault \\ \hspace*{0.5mm}code\end{minipage}}} & \multirow{2}{*}{\textbf{description}} & \multirow{2}{*}{\textbf{fault string}} \\ 
+ & & \\ \hline
+\fault{0}{Unknown fault.}{Describes the unknown fault.}
+\fault{10}{The \ApiValue{class} is not defined.}{Specifies which \ApiValue{class}.}
+\fault{11}{The \ApiValue{class} cannot be instanced.}{Specifies which \ApiValue{class}.}
+\fault{12}{The attribute is not defined.}{Specifies which \ApiValue{attribute} in which \ApiValue{class}.}
+\fault{13}{The attribute type is wrong.}{Specifies which \ApiValue{attribute} in which \ApiValue{class} and also it specifies the present and required type.}
+\fault{14}{The attribute wasn't present and is required.}{Specifies which \ApiValue{attribute} in which \ApiValue{class}.}
+\fault{15}{The collection is empty and is required.}{Specifies which \ApiValue{collection} in which \ApiValue{class}.}
+\fault{16}{The attribute was present but is read-only.}{Specifies which \ApiValue{attribute} in which \ApiValue{class}.}
+\fault{17}{Wrong value for attribute was present.}{Specifies which \ApiValue{value} in which \ApiValue{attribute} in which \ApiValue{class}.}
+\fault{20}{The value of an enum attribute is wrong.}{Specifies which \ApiValue{value}.}
+\fault{21}{Failed to parse date/time value.}{Specifies which date/time \ApiValue{value}.}
+\fault{22}{Failed to parse period value.}{Specifies which period \ApiValue{value}.}
+\fault{23}{Failed to parse interval value.}{Specifies which interval \ApiValue{value}.}
+\fault{24}{Failed to parse partial date/time value.}{Specifies which partial date/time \ApiValue{value}.}
+\fault{30}{Item with wrong type was present in collection.}{Specifies which \ApiValue{item} in which \ApiValue{collection} and types which are allowed.}
+\fault{31}{Null value cannot be used as item in collection.}{Specifies which \ApiValue{collection}.}
+\fault{40}{Entity was not found}{Specifies which \ApiValue{entity}.}
+\fault{41}{Entity validation failed}{Specifies which \ApiValue{entity}.}
+\fault{50}{Security failure}{Describes the failure.}
+\fault{60}{JADE command unknown failure}{Specifies which command and describes the failure.}
+\fault{61}{JADE command timeout}{Specifies which command.}
+\fault{62}{Decoding of result from JADE command failed}{Specifies which command.}
+\fault{63}{JADE command is not understood}{Specifies which command.}
+\fault{64}{JADE command is refused}{Specifies which command.}
+\fault{65}{Connector agent was not found}{Specificies which connector agent.}
+\fault{99}{The request is not implemented yet. An application log must be checked for more details.}{Specifies what is not implemented.}
+\end{longtable}
+
+These are only common faults that are independent on specific API section. Other business logic faults can be generated and are described in appropriate API section.
+
+
+\section{Security and Identity Related}
+
+\begin{Api}
+
+\ApiType{SecurityToken}{String}
+Represents an identity and credentials of a user performing a request. \ApiRef{SecurityToken} equals to OpenID \cite{openid} access token (see section \ref{sec:implementation-authorization} for more details).
+
+\ApiClass{Person}{}
+Represents a base class for all persons that can be referenced by the Shongo.
+
+\ApiClass{UserPerson}{Person}
+Represents a person that has a user account for the Shongo.
+\begin{ApiClassAttributes}
+\ApiClassAttribute{userId}{String}{\ApiRequired} User-id of the user in the Shongo which can be used to retrieve user information from authorization server web service.
+\end{ApiClassAttributes}
+
+\ApiClass{OtherPerson}{Person}
+Represents a person that doesn't have a user account for the Shongo.
+\begin{ApiClassAttributes}
+\ApiClassAttribute{name}{String}{\ApiRequired} Full name of the user which can be displayed.
+\ApiClassAttribute{organization}{String}{\ApiOptional} Root organization of the person.
+\ApiClassAttribute{email}{String}{\ApiRequired} Email to which a videoconference invitation should be sent.
+\end{ApiClassAttributes}
+
+\end{Api}
+
+
+\section{Time Related}
+
+\begin{Api}
+
+\ApiType{Period}{String}
+Used for representing period or duration. Format is specified by ISO8601 period (e.g., \ApiValue{P3Y6M4DT12H30M5S} which is \textit{3 years, 6 months, 4 days, 12 hours, 30 minutes, and 5 seconds} or \ApiValue{P4W} which is \textit{4 weeks}). The first character "\ApiValue{P}" means period and it comes from the ISO8601 standard. Components can be omitted (e.g.,~\ApiValue{P3YT12H} which is \emph{3 years and 12 hours}). The zero duration is represented by \ApiValue{PT0S} value (which is \emph{0 seconds}).
+
+\ApiExample We want to set videoconference duration:
+\begin{quote}
+\begin{verbatim}
+duration = PT2H
+\end{verbatim}
+\end{quote}
+
+\ApiType{DateTime}{String}
+Used for representing an absolute date/time. Format is specified by ISO8601 date/time in UTC (e.g., 20120130T10:09:55) or with explicit timezone specification (e.g., 20120130T10:09:55+02:00).
+
+\ApiExample We want to create a new reservation for resources at the precise date. We can specify it by \ApiRef{DateTime}:
+\begin{quote}
+\begin{verbatim}
+dateTime = 2012-12-31T12:00
+\end{verbatim}
+\end{quote}
+
+\ApiType{RelativeDateTime}{Period}
+Used for representing a relative date/time. Relative date/time can be evaluated to absolute date/time by specifying a referenced absolute date/time.
+
+\ApiExample We want to define a maximum future to which a resource can be scheduled. We can specify it by \ApiRef{RelativeDateTime} as follows:
+\begin{quote}
+\begin{verbatim}
+relativeDateTime = P4M
+\end{verbatim}
+\end{quote}
+The \ApiValue{relativeDateTime} can be evaluated by using reference date/time \ApiValue{2012-01-01T00:00} to \ApiValue{2012-05-01T00:00}.
+
+\ApiClass{PeriodicDateTime}{}
+It can be used for events that takes place repeatedly, but also for events that take place only once.
+
+\begin{ApiClassAttributes}
+\ApiClassAttribute{start}{DateTime}{\ApiRequired}
+Defines the first occurrence of an event.
+\ApiClassAttribute{period}{Period}{\ApiOptional}
+Defines the period in which the repeated events take place. See \ApiRef{Period} for format specification.
+\ApiClassAttribute{end}{DateTime}{\ApiOptional}
+Ending date/time for events to not occur forever (not required, we can specify infinite periodic date/time).
+\ApiLabel{api:Rule}
+\ApiClassAttributeCollection{rules}{List}{Rule}{\ApiOptional}
+List of rules, which can define an extra events out of the periodicity or cancel specified periodical events. \ApiCode{Rule} can be one of the following types:
+\begin{compactitem}
+\item \ApiCode{Enable}/\ApiCode{Disable} event(s) in the specified \ApiCode{dateTime} or interval by \ApiCode{start} and \ApiCode{end}.
+\item \ApiCode{Extra} event in the specified \ApiCode{dateTime}
+\end{compactitem}
+Rules contains implicit definition of \ApiCode{Enable} rule for whole \ApiRef{PeriodicDateTime} interval. Conflicts are solved by \emph{last-match} policy.
+\end{ApiClassAttributes}
+
+\ApiExample Only one lecture on 20.3.2012.
+\begin{quote}
+\begin{verbatim}
+periodicDateTime.start = 20110908T12:00:00
+\end{verbatim}
+\end{quote}
+
+\ApiExample A lecture on every Thursday at 12:00 with extra lecture on 20.3.2012 and Christmas holidays.
+\begin{quote}
+\begin{verbatim}
+periodicDate.start = 20110908T12:00:00
+periodicDate.period = P1W
+periodicDate.end = 20120631
+periodicDate.rules = {
+    { type = Disable, from = 20111219, to = 20120101 },
+    { type = Extra, dateTime = 20120320 }
+}
+\end{verbatim}
+\end{quote}
+
+\ApiType{Interval}{String}
+Represents the time between two instants. Values must be in format \ApiValue{<start>/<duration>} where \ApiValue{<start>} is in \ApiRef{DateTime} format and \ApiValue{<duration>} in \ApiRef{Period} format.
+
+\end{Api}
+
+
+\section{Other} \label{sect:common:other}
+
+\begin{Api}
+
+\ApiEnum{Technology}
+Enumeration of supported (or planned to be supported) videoconference technologies.
+\begin{ApiEnumValues}
+\ApiEnumValue{H323}{}
+\ApiEnumValue{SIP}{}
+\ApiEnumValue{ADOBE_CONNECT}{}
+\ApiEnumValue{SKYPE}{}
+\ApiEnumValue{BIG_BLUE_BUTTON}{}
+\ApiEnumValue{OPEN_MEETING}{}
+\ApiEnumValue{WEBEX}{}
+\end{ApiEnumValues}
+
+\ApiClass{RoomUser}{}
+Represents an active user in a virtual room on a server.
+\begin{ApiClassAttributes}
+\ApiClassAttribute{userId}{String}{\ApiReadOnly}
+User identification in room (technology specific).
+\ApiClassAttribute{roomId}{String}{\ApiReadOnly}
+Room unique identifier. \todo{The identifier should contain a part denoting the user and a part denoting his/her session -- as requested by use case \ref{UC:ops:room:users-list}. resolved on the UserIdentity level}
+\ApiClassAttribute{userIdentity}{UserIdentity}{\ApiReadOnly}
+User identity which in some cases may be \ApiValue{null} (e.g., when the user is calling from cell phone).
+\ApiClassAttribute{displayName}{String}{} Display name, i.e., name of the user displayed to others.
+\ApiClassAttribute{joinTime}{DateTime}{} Date and time when the user joined the room.
+\ApiClassAttribute{microphoneEnabled}{boolean}{}
+Is the user audio-muted?
+\ApiClassAttribute{videoEnabled}{boolean}{}
+Is the user video-muted?
+\ApiClassAttribute{microphoneLevel}{int}{}
+Microphone level.
+\ApiClassAttribute{playbackLevel}{int}{}
+Playback level (speakers volume)
+\ApiClassAttribute{layout}{RoomLayout}{\ApiOptional}
+User layout, overriding the room default layout.
+\end{ApiClassAttributes}
+
+\end{Api}
+

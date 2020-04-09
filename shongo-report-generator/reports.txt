@@ -1,0 +1,281 @@
+
+1. COMMON REPORTS
+-----------------
+
+  Common reports are stored for each reservation request when the request is being created, modified or preprocessed.
+
+ * Specification Not Ready
+   - when a PersonParticipant (in the CompartmentSpecification) is not accepted or rejected by the requested person
+   - when the report is stored, the reservation request is in "NOT_COMPLETE" state (and it won't be scheduled until
+     it is "COMPLETE")
+
+
+2. SCHEDULER REPORTS
+--------------------
+
+  Scheduler reports are stored for each reservation request which is being allocated by the Scheduler.
+
+ * Specification Not Allocatable [ERROR]
+   - when a specification for a target which cannot be allocated is specified in the reservation request
+     (e.g., ExternalEndpointSpecification make sense only inside the CompartmentSpecification,
+      so this error will be reported when you try to use it in the reservation request)
+
+ * Duration Longer Than Maximum [ERROR] (duration : Period, maxDuration : Period)
+   - when a resource is requested for longer duration than the maximum configured in the controller.
+   - when a value is requested for longer duration than the maximum configured in the controller,
+     value must be reserved for each alias reservation
+
+ * Reused Reservation Not Available [ERROR]
+   - when reusable reservation is already used by another reservation
+
+ * Reused Reservation Not Usable [ERROR]
+   - the time slot of the reusable reservation doesn't contain the whole
+     requested time slot
+
+ * Resource Not Endpoint [ERROR]
+   - when ExistingEndpointSpecification references a resource which isn't a device or doesn't have a TerminalCapability
+
+ * Resource Not Found [ERROR]
+   - when LookupEndpointSpecification hasn't found any available endpoint
+
+ * <Allocating Resource> (resource : Resource)
+
+     # (if) Resource Requested Multiple Times [ERROR]
+
+     # (if) Resource Not Allocatable [ERROR]
+
+     # (if) Resource Not Available [ERROR]
+
+     # (if) Reusing Reusable Reservation [OK]
+
+     # [OK]
+
+ * <Allocating Alias> (technologies : Technology[], types : AliasTypes[], value : String)
+
+     # Finding Available Resources [NEXT|ERROR]
+
+         * (loop) Available Resource
+
+     # Sorting Resources
+
+     # (loop) <Allocating Resource> [OK|CONTINUE]
+
+         * (if) Value No Available [ERROR]
+                 - all possible values are already allocated
+
+         * (if) Value Already Allocated [ERROR]
+                 - requested value is already allocated
+
+         * (if) Value Invalid [ERROR]
+                 - requested value doesn't match the pattern of the value generator
+
+     # [ERROR]
+
+ * <Allocating Room> (technologySets : Technology[][], participantCount : int)
+
+     # (if) Reusing Reusable Reservation [OK]
+
+     # Finding Available Resources [NEXT|ERROR]
+
+         * (loop) Available Resource
+
+     # Sorting Resources
+
+     # (loop) <Allocating Resource> [OK|CONTINUE]
+
+         * (if) Allocating Room
+
+         * (if) Reusing Room
+
+         * (loop) <Allocating Alias> [CONTINUE|NEXT]
+
+         * [OK]
+
+     # [ERROR]
+
+ * <Allocating Connection from # to #>
+
+     # (if) Cannot Create Connection To External Endpoint Set [ERROR]
+
+     # <Allocating Alias> [OK|ERROR]
+
+         * (if) Cannot Assign Alias To External Endpoint [ERROR]
+
+     # [OK]
+
+ * <Allocating Connection>
+
+     # Allocating Connection from Endpoint#1 To Endpoint#2> [OK|NEXT]
+
+     # Allocating Connection from Endpoint#2 To Endpoint#1> [OK|ERROR]
+
+ * Allocating Compartment
+
+     # (if) Not Enough Endpoints [ERROR]
+
+     # (if 2 endpoints) <Allocating Connection> [OK|ERROR]
+
+     # (else) <Allocating Room> [NEXT|ERROR]
+
+     # (loop) <Allocating Connection> [CONTINUE|ERROR]
+
+     # [OK]
+
+ Explanatory Notes:
+
+    (if)
+        represents that some condition is checked, and the report is generated only in some cases
+    (loop)
+        represents that the report can be generated zero or more times
+    [OK]
+        the report represents a successful allocation and the scheduling task is immediately exited
+    [ERROR]
+        the report represents an error and the current allocation is immediately exited
+    [NEXT]
+        the scheduling task continues to the next action
+    [CONTINUE]
+        the scheduling task continues to the next loop cycle
+    [@1|@2]
+        if the current allocation which is described by the report succeeds, then the report is considered as @1,
+        otherwise the report is considered as @2 (the @1 and @2 can be any of [OK], [ERROR], [NEXT], [CONTINUE]).
+
+ Examples:
+
+ * Failed Alias Reservation (all values are allocated):
+
+        -[ERROR] Allocating alias for the following specification:
+          |       Technology: Any
+          |       Alias Type: H323_E164
+          |       Value: Any
+          |
+          +--[OK] Finding available resource
+          |   |
+          |   +--Capability 'AliasProviderCapability' in device 'shongo:test:res:5'
+          |
+          +--Sorting resources
+          |
+          +--[ERROR] Allocating capability 'AliasProviderCapability' in device 'shongo:test:res:5'
+              |
+              +--[ERROR] No value is available
+
+ * Successful Alias Reservation (reusing reusable reservation):
+
+        -[OK] Allocating alias for the following specification:
+          |    Technology: Any
+          |    Alias Type: H323_E164
+          |    Value: 2
+          |
+          +--[OK] Finding available resource
+          |   |
+          |   +--Capability 'AliasProviderCapability' in device 'shongo:test:res:1'
+          |   |
+          |   +--Capability 'AliasProviderCapability' in device 'shongo:test:res:5'
+          |
+          +--Sorting resources
+          |
+          +--[OK] Allocating capability 'AliasProviderCapability' in device 'shongo:test:res:5'
+              |
+              +--[OK] Reusing reservation 'shongo:test:rsv:8'.
+
+
+ * Failed Room Reservation (no available resource):
+
+        -[ERROR] Allocating room for the following specification:
+          |         Technology: [H.323]
+          |       Participants: 5
+          |
+          +--[ERROR] Finding available resource
+
+ * Successful Room Reservation (the first resource cannot get allocated alias):
+
+        -[OK] Allocating room for the following specification:
+          |      Technology: [H.323]
+          |    Participants: 5
+          |
+          +--[OK] Finding available resource
+          |   |
+          |   +--Device 'shongo:test:res:1'
+          |   |
+          |   +--Device 'shongo:test:res:2'
+          |
+          +--Sorting resources
+          |
+          +--[ERROR] Allocating device 'shongo:test:res:1'
+          |   |
+          |   +--[OK] Allocating new executable
+          |   |
+          |   +--[ERROR] Allocating alias for the following specification:
+          |       |       Technology: Any
+          |       |       Alias Type: H323_E164
+          |       |       Value: Any
+          |       |
+          |       +--[ERROR] Finding available resource
+          |
+          +--[OK] Allocating device 'shongo:test:res:2'
+              |
+              +--[OK] Allocating new executable
+              |
+              +--[OK] Allocating alias for the following specification:
+                  |    Technology: Any
+                  |    Alias Type: H323_E164
+                  |    Value: Any
+                  |
+                  +--[OK] Finding available resource
+                  |   |
+                  |   +--Capability 'AliasProviderCapability' in device 'shongo:test:res:2'
+                  |
+                  +--Sorting resources
+                  |
+                  +--[OK] Allocating capability 'AliasProviderCapability' in device 'shongo:test:res:2'
+
+
+3. EXECUTION REPORTS
+--------------------
+
+ Execution reports are stored for each executable (virtual room, compartment, etc).
+
+ Types:
+
+ * Command Failure (command : String)
+
+   - Represents a failure of a command which was sent to a connector agent. Attribute 'command' stores the
+     name of the command (e.g., 'CreateRoom').
+
+   - Possible types:
+
+      # Agent Not Found (agentName : String)
+         -: receiver agent (in connector) is not available
+         -> try again
+
+      # Agent Not Started (agentName : String)
+         -: sender agent (in controller) is not started yet
+         -> try again
+
+      # Timeout
+         -: sender agent hasn't received the response in specified period of time
+         -> try again
+
+      # Not supported
+         -: receiver agent does not implement (support) the requested command
+         -> report to resource administrator
+
+      # Error (message : String)
+         -: receiver agent throws CommandException while processing the command,
+            the 'message' attribute stores the exception message
+         -> report to resource administrator
+
+      # Refused
+         -: receiver jade agent refused the request
+         -> report to shongo administrator
+
+      # Not Understood
+         -: receiver jade agent didn't understand the request
+         -> report to shongo administrator
+
+      # Result Decoding Error
+         -: sender jade agent cannot decode the response
+         -> report to shongo administrator
+
+      # Unknown Failure (message : String)
+         -: receiver agent has thrown undeclared exception or some other unknown problem has happened
+         -> report shongo and resource administrator

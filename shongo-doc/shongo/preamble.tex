@@ -1,0 +1,125 @@
+\documentclass[a4paper]{report}
+
+% Setup layout
+\usepackage{geometry}
+\geometry{paper=a4paper}
+
+% Font setup
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenx}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{microtype}
+\renewcommand*\ttdefault{txtt}
+
+% Language setup
+\usepackage[czech,english]{babel}
+
+% Setup hyperlinks in PDF
+\usepackage[
+  pdftex,
+  breaklinks=true,
+  pdfborder={0 0 0}
+]{hyperref}
+
+% Glossaries
+\usepackage[sort=def, xindy, nonumberlist]{glossaries}
+\usepackage{glossary-long}
+\makeglossaries
+
+% Other includes
+\usepackage{url}
+\usepackage{paralist}
+\usepackage{parcolumns}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{subfigure}
+
+% If then else
+\usepackage{ifthen}
+
+% Code listing
+\usepackage{verbatim}
+\usepackage{listingsutf8}
+\usepackage{showexpl}
+\lstset{
+  escapechar=\⠶
+}
+
+% Bibliography
+\usepackage[nottoc]{tocbibind}
+\bibliographystyle{elsarticle-num}
+
+% Command \provideenvironment and \providecounter
+\makeatletter
+\def\provideenvironment{\@star@or@long\provide@environment}
+\def\provide@environment#1{%
+        \@ifundefined{#1}%
+                {\def\reserved@a{\newenvironment{#1}}}%
+                {\def\reserved@a{\renewenvironment{dummy@environ}}}%
+        \reserved@a
+}
+\def\dummy@environ{}
+\makeatother
+\makeatletter
+\newcommand*\providecounter[1]{%
+  \@ifundefined{c@#1}%
+    {\@definecounter{#1}}%
+    {}%
+}
+\makeatother
+
+% Command \todo
+\newcommand{\todo}[1]{%
+\def\empty{}%
+\def\prvniparametr{#1}%
+\ifx\prvniparametr\empty%
+\begingroup\small\tt\textcolor{red}{\noindent\textbf{TODO}}\endgroup
+\else%
+\begingroup\small\tt\textcolor{red}{\noindent\textbf{TODO:}\ #1}\endgroup
+\fi%
+}
+
+% Code inline
+\lstdefinestyle{lstStyleShort}{
+  breaklines=true,
+  breakatwhitespace=true,
+  breakautoindent=true,
+}
+\newcommand{\code}[1]{\textbf{\small\texttt{#1}}\normalsize}
+\newcommand{\codeValue}[1]{\texttt{#1}}
+
+% Document title page
+\author{Martin Šrom, Petr Holub, Jan Růžička, Miloš Liška, Ondřej Pavelka, Ivan Novakov}
+\date{\copyright~CESNET~z.\,s.\,p.\,o.\\2013}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Entity example (type, name, comment)
+\lstnewenvironment{ObjectCode}[3]{%
+    \removelastskip
+    \vskip 3mm
+    \lstset{
+      aboveskip=0pt,
+      belowskip=0pt,    
+      xleftmargin=8pt,
+      basicstyle=\fontfamily{txtt}\selectfont,
+      keywordstyle=\fontseries{b}\selectfont,
+      comment=[l]{//},      
+    }
+    \minipage{\textwidth}
+    \advance\leftmargini -3mm \quote
+    \footnotesize\ttfamily #2 = \ifx&#1&\else\textbf{#1} \fi{}\{
+    \ifx&#3& \else {\color{gray}// #3} \fi
+}{%    
+    \vspace*{-4pt}
+    \footnotesize\ttfamily \}
+    \endquote
+    \endminipage
+    \vskip 3mm
+}
+
+
+

@@ -1,0 +1,138 @@
+\definecolor{ApiLstKeywordColor}{rgb}{0,0,0.4}
+\lstset{
+  extendedchars=false,
+  alsoletter={-},
+  basicstyle=\small\fontfamily{txtt}\fontseries{b}\selectfont,
+  keywordstyle=\color{ApiLstKeywordColor}\selectfont,
+  commentstyle=\color{black!60}\selectfont,
+}
+\lstdefinestyle{ApiLstStyle}{
+  language=java,
+  morekeywords={enum, atomic_type},
+  breaklines=true,
+  breakatwhitespace=true,
+  breakautoindent=true,
+}
+
+\providecounter{ApiCounter}
+\providecommand{\ApiLabel}[1]{\refstepcounter{ApiCounter}\label{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API definition
+\provideenvironment{Api}{\begin{itemize}}{\end{itemize}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API definition code and value
+\providecommand{\ApiCode}[1]{\lstinline[style=ApiLstStyle]{#1}}
+\providecommand{\ApiValue}[1]{\texttt{#1}}
+% \end{verbatim}
+% Previous line corrects syntax coloring parser
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API definition item
+\providecommand{\ApiItem}[1]{\item #1 %
+
+% Previous empty line is intended to be blank (wraps the text
+% to the next line even if the \ApiItem is not followed by empty line)
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API command
+\provideenvironment{ApiCmd}[2]{{\item \ApiRef{#1} \ApiCode{#2(}}%
+\def\ApiCmdTmpFirst{\boolean{true}}%
+}{\ApiCode{)}%
+
+% Previous empty line is intended to be blank
+}
+\provideenvironment{ApiCmdCollection}[3]{{\item \ApiCode{#1<}\ApiRef{#2}\ApiCode{>} \ApiCode{#3(}}%
+\def\ApiCmdTmpFirst{\boolean{true}}%
+}{\ApiCode{)}%
+
+% Previous empty line is intended to be blank
+}
+\providecommand{\ApiCmdParam}[2]{%
+\ifthenelse{\ApiCmdTmpFirst}{}{, }%
+\ApiRef{#1} \ApiCode{#2}%
+\def\ApiCmdTmpFirst{\boolean{false}}%
+}
+\providecommand{\ApiCmdParamMap}[3]{%
+\ifthenelse{\ApiCmdTmpFirst}{}{, }%
+\ApiCode{Map<#1,} \ApiRef{#2}\ApiCode{> #3}%
+\def\ApiCmdTmpFirst{\boolean{false}}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API atomic type
+\providecommand{\ApiType}[2]{\ApiLabel{api:#1}\ApiItem{%
+  \ifx&#2& \ApiCode{atomic_type #1} \else \ApiCode{atomic_type #1 =\ }\ApiRef{#2} \fi}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API class
+\providecommand{\ApiClass}[2]{\ApiLabel{api:#1}\ApiItem{%
+  \ifx&#2& \ApiCode{class #1} \else \ApiCode{class #1 extends\ }\ApiRef{#2} \fi}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API class attributes
+\provideenvironment{ApiClassAttributes}{% Next empty line is intended to be blank
+
+\begin{samepage}\textbf{Attributes:}\begin{compactitem}}{\end{compactitem}\end{samepage}}
+\providecommand{\ApiRequired}{{\color{blue!50!black}\textbf{Required}}}
+\providecommand{\ApiOptional}{{\color{gray}\textbf{Optional}}}
+\providecommand{\ApiOptionalDefault}[1]{{\color{gray}\textbf{Optional}, default: \ApiValue{#1}}}
+\providecommand{\ApiReadOnly}{{\color{red!50!black}\textbf{ReadOnly}}}
+\providecommand{\ApiClassAttribute}[3]{\ApiItem{\ApiRef{#2} \ApiCode{#1} \hspace{1mm}(\ifx&#3&\ApiReadOnly\else#3\fi)}}
+\providecommand{\ApiClassAttributeCollection}[4]{\ApiItem{\ApiCode{#2<}\ApiRef{#3}\ApiCode{>} \ApiCode{#1} \hspace{1mm}(\ifx&#4&\ApiReadOnly\else#4\fi)}}
+\providecommand{\ApiClassAttributeMap}[5]{\ApiItem{\ApiCode{#2<}\ApiRef{#3}\ApiCode{,}\ApiRef{#4}\ApiCode{>} \ApiCode{#1} \hspace{1mm}(\ifx&#5&\ApiReadOnly\else#5\fi)}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API enum
+\providecommand{\ApiEnum}[1]{\ApiLabel{api:#1}\ApiItem{\ApiCode{enum #1}}}
+\provideenvironment{ApiEnumValues}{% Next empty line is intended to be blank
+
+\begin{samepage}\textbf{Enumeration values:}\begin{compactitem}}{\end{compactitem}\end{samepage}}
+\providecommand{\ApiEnumValue}[2]{\ApiItem{{\ApiCode{#1} \ifx&#2& \else \ApiValue{(#2)} \fi}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API example
+\providecommand{\ApiExample}{% Next empty line is intended to be blank
+
+\textbf{Example:}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API note
+\providecommand{\ApiNote}{% Next empty line is intended to be blank
+
+\textbf{Note:}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API failures
+\provideenvironment{ApiFailures}{\begin{compactitem}}{\end{compactitem}}
+\providecommand{\ApiFailure}[1]{\ApiItem{\ApiCode{faultCode = #1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% API ref
+\providecommand{\ApiRef}[1]{%
+\foreach \ApiTmp [count=\ApiTmpIndex] in{#1}{%
+%
+\ifthenelse{\ApiTmpIndex > 1}{\ApiCode{|}}{}%
+%
+\def\tmpResult{\boolean{false}}%
+\ifthenelse{\equal{\ApiTmp}{String}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{void}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{int}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{boolean}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{long}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{float}}{\def\tmpResult{\boolean{true}}}{}%
+\ifthenelse{\equal{\ApiTmp}{byte[]}}{\def\tmpResult{\boolean{true}}}{}%
+%
+\ifthenelse{\tmpResult}{%
+\textbf{\texttt{\ApiTmp}}
+}{%
+\hyperref[api:\ApiTmp]{\code{\ApiTmp}}%
+}%
+}%
+}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd">
+
+    <!-- Enables @Resource annotations -->
+    <context:annotation-config />
+    <!-- Enables @Scheduled annotations -->
+    <task:annotation-driven />
+
+    <!-- Application configuration -->
+    <bean id="configuration" class="cz.cesnet.shongo.client.web.ClientWebConfiguration" factory-method="getInstance">
+    </bean>
+
+    <bean id="controllerClient" class="cz.cesnet.shongo.controller.ControllerClient">
+        <constructor-arg>
+            <bean factory-bean="configuration" factory-method="getControllerUrl"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="controllerCommonService" class="cz.cesnet.shongo.controller.api.rpc.CommonService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.CommonService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="controllerResourceService" class="cz.cesnet.shongo.controller.api.rpc.ResourceService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.ResourceService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="controllerReservationService" class="cz.cesnet.shongo.controller.api.rpc.ReservationService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.ReservationService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="controllerExecutableService" class="cz.cesnet.shongo.controller.api.rpc.ExecutableService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.ExecutableService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="controllerResourceControlService" class="cz.cesnet.shongo.controller.api.rpc.ResourceControlService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.ResourceControlService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="controllerAuthorizationService" class="cz.cesnet.shongo.controller.api.rpc.AuthorizationService"
+          factory-bean="controllerClient" factory-method="getService">
+        <constructor-arg value="cz.cesnet.shongo.controller.api.rpc.AuthorizationService" type="java.lang.Class"/>
+    </bean>
+
+    <bean id="cache" class="cz.cesnet.shongo.client.web.Cache">
+    </bean>
+
+    <bean id="roomManagementCache" class="cz.cesnet.shongo.client.web.RoomCache">
+    </bean>
+
+    <!-- Permission evaluator -->
+    <bean id="permissionEvaluator" class="cz.cesnet.shongo.client.web.auth.PermissionEvaluator">
+    </bean>
+
+    <!-- reCaptcha -->
+    <bean id="reCaptcha" class="net.tanesha.recaptcha.ReCaptchaImpl">
+        <property name="publicKey" value="#{configuration.reCaptchaPublicKey}"/>
+        <property name="privateKey" value="#{configuration.reCaptchaPrivateKey}"/>
+        <property name="includeNoscript" value="false"/>
+        <property name="recaptchaServer" value="https://www.google.com/recaptcha/api"/>
+    </bean>
+
+</beans>

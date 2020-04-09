@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Default Configuration of Domain Controller -->
+<configuration>
+
+    <!-- Timezone in which the controller should work and
+         which is used as default for date/times without specific timezone -->
+    <timezone>UTC</timezone>
+
+    <!-- Configuration of controlled domain -->
+    <domain>
+        <name>unknown</name>
+        <organization>Unknown Organization</organization>
+        <!-- Interdomain protocol listening port -->
+        <inter-domain-connection>
+            <!--<host>localhost</host>-->
+            <!-- Secure port for interdomain protocol -->
+            <!--<port></port>-->
+            <!-- Use PKI client auth, basic auth otherwise -->
+            <!--<pki-client-auth>true</pki-client-auth>-->
+            <command-timeout>PT10S</command-timeout>
+            <!-- Refresh rate for domains connector cache -->
+            <cache-refresh-rate>PT5M</cache-refresh-rate>
+            <!-- TrustStore of JKS/PKCS12 type with private key and certificate chain of local domain -->
+            <!--<ssl-key-store></ssl-key-store>-->
+            <!--<ssl-key-store-type></ssl-key-store-type>-->
+            <!--<ssl-key-store-password></ssl-key-store-password>-->
+            <!-- Trusted CA's of foreign domains (PEM) -->
+            <!--<ssl-trust-store>-->
+                <!--<ca-certificate></ca-certificate>-->
+            <!--</ssl-trust-store>-->
+            <!-- Basic authentication(if PKI is not set) -->
+            <!--<basic-auth>-->
+                <!--<password></password>-->
+            <!--</basic-auth>-->
+        </inter-domain-connection>
+    </domain>
+
+    <!-- Database settings -->
+    <database>
+        <driver>org.hsqldb.jdbcDriver</driver>
+        <url>jdbc:hsqldb:file:data/controller; shutdown=true; hsqldb.write_delay=false;</url>
+        <username>sa</username>
+        <password></password>
+    </database>
+
+    <!-- Configuration of XML-RPC server -->
+    <rpc>
+        <host></host>
+        <port>8181</port>
+        <ssl-key-store></ssl-key-store>
+        <ssl-key-store-password></ssl-key-store-password>
+    </rpc>
+
+    <!-- Configuration of Jade container -->
+    <jade>
+        <host>127.0.0.1</host>
+        <port>8282</port>
+        <agent-name>Controller</agent-name>
+        <platform-id>Shongo</platform-id>
+        <!-- Timeout to receive response when performing commands from agents -->
+        <command-timeout>PT33S</command-timeout>
+    </jade>
+
+    <!-- Security settings -->
+    <security>
+        <!-- AA server -->
+        <server>https://shongo-auth-dev.cesnet.cz/testing</server>
+        <!-- Client ID for AA server  -->
+        <client-id>shongo-controller</client-id>
+        <!-- Specifies filename where the root access token will be written when controller starts -->
+        <root-access-token>root.access-token</root-access-token>
+        <!-- Specifies authorization cache expiration -->
+        <expiration>
+            <!-- Expiration of user-id by access-token -->
+            <user-id>PT30M</user-id>
+            <!-- Expiration of user information by user-id -->
+            <user-information>PT5M</user-information>
+            <!-- Expiration of user ACL by user-id -->
+            <acl>PT5M</acl>
+            <!-- Expiration of user groups -->
+            <group>PT5M</group>
+        </expiration>
+        <!-- Authorization expressions -->
+        <authorization>
+            <!-- Expression for decision whether user can act as administrator -->
+            <administrator>group("admins").contains(id)</administrator>
+            <!-- Expression for decision whether user can act as operator -->
+            <operator>group("operators").contains(id)</operator>
+            <!-- Expression for decision whether user can create a new reservation request -->
+            <reservation>loa >= 2 || group("reservation").contains(id)</reservation>
+        </authorization>
+        <!-- For offline purposes - will not fetch user grups -->
+        <!--<authorization>-->
+            <!--<administrator>false</administrator>-->
+            <!--<operator>false</operator>-->
+            <!--<reservation>true</reservation>-->
+        <!--</authorization>-->
+    </security>
+
+    <!-- Worker periodically starts preprocessor and scheduler -->
+    <worker>
+        <!-- Period in which the worker is periodically working -->
+        <period>PT5S</period>
+        <!-- Length of working interval -->
+        <lookahead>P31D</lookahead>
+    </worker>
+
+    <!-- Executor periodically checks executables for execution -->
+    <executor>
+        <!-- Period in which the executor is periodically checking executables -->
+        <period>PT15S</period>
+        <!-- Configuration for each executable -->
+        <executable>
+            <!-- Period modifying executable starting date/time -->
+            <start>PT-30S</start>
+            <!-- Period modifying executable ending date/time -->
+            <end>PT-30S</end>
+            <!-- Period in which the action is repeated if it fails -->
+            <next-attempt>PT2M</next-attempt>
+            <!-- Maximum count of attempts -->
+            <max-attempt-count>15</max-attempt-count>
+        </executable>
+
+        <!-- Configuration of durations which should be reserved for starting executables -->
+        <starting-duration>
+            <!-- Duration for which the executor waits when a room is being to started -->
+            <room>PT5S</room>
+        </starting-duration>
+    </executor>
+
+    <!-- Reservation configuration -->
+    <reservation>
+        <!-- Configuration of room reservations -->
+        <room>
+            <!-- Maximum duration of a room reservation -->
+            <max-duration>P1W</max-duration>
+        </room>
+    </reservation>
+
+    <!-- Configuration for sending emails -->
+    <smtp>
+        <sender>no-reply@shongo.cz</sender>
+        <!--<host></host>-->
+        <port>25</port>
+        <!--<username></username>-->
+        <!--<password></password>-->
+        <subject-prefix xml:space="preserve">[${domain.shortName}] </subject-prefix>
+    </smtp>
+
+    <!-- Configuration of notifications -->
+    <notification>
+        <!--<reservation-request-url></reservation-request-url>-->
+        <!--<user-settings-url></user-settings-url>-->
+        <!--<reservation-request-confirmation-url></reservation-request-confirmation-url>-->
+    </notification>
+
+    <!-- Configuration of domain administrators-->
+    <!--<administrator></administrator>-->
+
+    <!-- SSL configuration -->
+    <!--<ssl>-->
+        <!-- Mapping source hostname to different target hostname for certificate hostname verification -->
+        <!--<mapped-hostname source="illegal-host-name" target="corrected-host-name"/>-->
+        <!-- Trusted hostname for certificate hostname verification -->
+        <!--<trusted-hostname>host-name</trusted-hostname>-->
+    <!--</ssl>-->
+
+</configuration>

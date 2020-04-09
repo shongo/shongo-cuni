@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Default Configuration of Web Client -->
+<configuration>
+
+    <!-- Web server configuration -->
+    <server>
+        <!-- HTTP port -->
+        <port>80</port>
+        <!-- HTTPS port -->
+        <ssl-port>443</ssl-port>
+        <!-- Java key store for SSL -->
+        <ssl-key-store></ssl-key-store>
+        <ssl-key-store-password></ssl-key-store-password>
+        <!-- Base context path to bind -->
+        <path>/</path>
+        <!-- Specifies whether HTTP requests should be redirect to HTTPS -->
+        <force-https>true</force-https>
+        <!-- Specifies whether the forwarded host should be read from X-Forwarded-* headers -->
+        <forwarded>false</forwarded>
+        <!-- Specifies the forwarded host when X-Forwarded-* headers are missing -->
+        <forwarded-host></forwarded-host>
+    </server>
+
+    <!-- Controller url -->
+    <controller>127.0.0.1:8181</controller>
+
+    <!-- Authorization -->
+    <security>
+        <!-- AA server -->
+        <server>https://shongo-auth-dev.cesnet.cz/testing</server>
+        <!-- Client ID for AA server  -->
+        <client-id>shongo-client-web</client-id>
+        <!-- Client ID redirect URI for AA server  -->
+        <redirect-uri>http://127.0.0.1:8182/</redirect-uri>
+    </security>
+
+    <!-- Configuration for sending emails -->
+    <smtp>
+        <sender>no-reply@shongo.cz</sender>
+        <!--<host></host>-->
+        <port>25</port>
+        <!--<username></username>-->
+        <!--<password></password>-->
+        <subject-prefix xml:space="preserve">[shongo-web] </subject-prefix>
+    </smtp>
+
+    <!-- Administrator emails -->
+    <administrator></administrator>
+    <administrator></administrator>
+
+    <!-- Design configuration -->
+    <design>
+        <!-- Design source folder -->
+        <folder>(default)</folder>
+        <!-- Design parameters -->
+        <!--<parameters>-->
+            <!-- Show maintenance message -->
+            <!--<maintenance>true</maintenance>-->
+        <!--</parameters>-->
+        <!-- Show only meeting rooms on dashboard -->
+        <!--show-only-meeting-rooms>true</show-only-meeting-rooms-->
+    </design>
+
+    <!-- ReCaptcha configuration (for reporting problems by unauthenticated users) -->
+    <recaptcha>
+        <public-key></public-key>
+        <private-key></private-key>
+    </recaptcha>
+
+    <!-- SSL configuration -->
+    <!--<ssl>-->
+        <!-- Mapping source hostname to different target hostname for certificate hostname verification -->
+        <!--<mapped-hostname source="illegal-host-name" target="corrected-host-name"/>-->
+        <!-- Trusted hostname for certificate hostname verification -->
+        <!--<trusted-hostname>host-name</trusted-hostname>-->
+    <!--</ssl>-->
+
+    <!-- tags configuration -->
+    <!--<tags>-->
+        <!-- Tag name for filltering meeting rooms resources -->
+        <!--<meeting-room>mr</meeting-room>-->
+    <!--</tags>-->
+
+    <!-- Virtual room settings, e.g. aliases formats -->
+    <virtual-room-settings>
+        <h323-e164-number>^\+?\d{9\,14}$</h323-e164-number>
+    </virtual-room-settings>
+
+</configuration>

@@ -1,0 +1,161 @@
+0.9.3 (2018-11-17)
+
+    * Major Pexip extension (connector, modified web client and others).
+
+    * Confirmation of TCS dial set up.
+
+    * Removed delete notifications for both room (resource) and capacity.
+
+    * Modified technologies model (localized and more user friendly).
+
+    * Connections using TLS version 1.2.
+
+
+0.9.2 (2017-10-20)
+
+    * Calendar connector for sending ics files added.
+
+    * Web interface modifications (list of pros/cons for room types).
+
+    * Email messages now coming with bulk precedence.
+
+    * Multiple delete in list views.
+
+    * Added time zone definition to calendar events (solves bug with interpretation in Outlook).
+
+    * Specifying H.323 number available in Administration mode.
+
+    * Exclude specific dates from periodic slots.
+
+    * Performance issues fixed (list of reservation request and reservations on dashboards, check of availability - ValueReservation)
+
+    * IMPORTANT: Cache tables specification_summary and executable_summary added to DB. When updating Specification or Executable, an update of summary table is needed - method in entity itself (update[Specification/Executable]Summary()).
+
+    * Bug fixes (pin delete, cmd-cli localhost connection over ssl, permanent room slots, login after AJAX call redirect, change of reservation request periodicity type, available licence count, too long principal names).
+
+0.9.1 (2016-06-22)
+
+    * Reservation request confirmation.
+
+    * Notification of prepared H.323 recording.
+
+    * Making offline recordings for Adobe Connect.
+
+    * Calendar view updated - creating and managing reservations directly from calendar.
+
+    * New role for ACL - RESERVATION.
+
+    * New group EVERYONE with id 0.
+
+    * Delegation of user rights for users without clearance (>= LOA 2).
+
+    * Bug fixes (utf-8 encoding of recordings, encoding in cmd-cli, Perun url update, check of H.323 recording size).
+
+    * Inter domain communication implemented (resource reservation completed, virtual room with TODO).
+
+0.9.0 (2015-05-05)
+
+    * Added LifeSize ClearSea as alias service to CiscoMCUConnector.
+
+    * Web interface modifications (dashboard, request form).
+
+    * Added .ics calendar export for resources.
+
+    * Bug fixes.
+
+0.8.1 (2015-01-20)
+
+    * Meeting rooms reservation added.
+
+    * Recordings options added.
+
+    * Bug fixes.
+
+0.8.0 (2014-07-22)
+
+    * New system role - operator.
+
+    * Resource capacity utilization view for resource administrators and operators.
+
+    * Bug fixes.
+
+0.7.0 (2014-05-13)
+
+    * Management of Adobe Connect and MCU recordings.
+
+    * Merge user identities by using Perun as provider of user information.
+
+    * Added help page with description of room types.
+
+    * Added list of your participation in rooms to main page.
+
+    * Restrict the creation of new rooms to users with certain level of authenticity.
+
+    * Added option to send automatic email notifications to participants with iCalendar (.ics) attachment.
+
+    * Fixed runtime management of H.323/SIP rooms.
+
+    * New web interface design.
+
+0.6.0 (2013-10-18)
+
+    * Reservation system web interface rewritten to Java from scratch.
+
+    * Added selection for English or Czech language.
+
+    * Added user settings for language, timezone and administrator mode.
+
+    * Added "dashboard" of rooms for logged user to main page.
+
+    * Added breadcrumb navigation to the top of the layout.
+
+    * Added problem reporting to the right of the top menu.
+
+    * Allow to modify reservation requests and added history of a reservation request to the detail page
+      with "reverting" ability.
+
+    * Allow to delete a permanent room with all it's capacities.
+
+    * Automatically refresh reservation request state in detail page.
+
+    * Added configuration of room participants.
+
+    * Propagate user roles from permanent rooms to it's capacities.
+
+    * Show only actions which logged user can perform.
+
+    * User-friendly keyboard navigation.
+
+    * Added "Refresh" button and “All” option into “Records per page” for all tables in web client.
+
+    * Sort tables by any column.
+
+0.5.2 (2013-04-25)
+
+    * Added new error reporting system to controller. Domain and resource administrators are informed by email when
+      an error/failure occurs.
+
+    * Fixed Cisco MCU connector to use only single connection for XML-RPC requests.
+
+    * Fixed few issues when reservation request is deleted.
+
+    * Information emails are sent to users and administrators separately.
+
+0.5.1 (2013-04-05)
+
+    * Fixed assigning user roles for the case when user creates an alias reservation,
+      then a room capacity reservation for the alias and then assigns a new owner
+      to the room capacity reservation.
+
+    * Propagating user roles to devices (e.g., Adobe Connect) which are created while
+      reservation is already in "started" state.
+
+    * Sending internal error reports to configured Shongo administrators.
+
+    * Scheduler and Executor are now mutually exclusive.
+
+    * ACL entries are stored inside the Controller and only few of them are propagated to authorization server.
+
+0.5.0 (2013-03-27)
+
+    * First public BETA version.

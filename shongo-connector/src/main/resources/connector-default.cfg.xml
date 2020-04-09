@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Default Configuration of Connector -->
+<configuration>
+
+    <!-- Connection to controller -->
+    <controller>
+        <host>127.0.0.1</host>
+        <port>8282</port>
+        <connection-check-period>PT10S</connection-check-period>
+    </controller>
+
+    <!-- Configuration of Jade container -->
+    <jade>
+        <host>127.0.0.1</host>
+        <port>8383</port>
+        <!-- Timeout to receive response when performing JADE commands from agents -->
+        <command-timeout>PT10S</command-timeout>
+    </jade>
+
+    <!-- SSL configuration -->
+    <!--<ssl>-->
+        <!-- Mapping source hostname to different target hostname for certificate hostname verification -->
+        <!--<mapped-hostname source="illegal-host-name" target="corrected-host-name"/>-->
+        <!-- Trusted hostname for certificate hostname verification -->
+        <!--<trusted-hostname>host-name</trusted-hostname>-->
+    <!--</ssl>-->
+
+    <!-- Connector instances (agents) to automatically start -->
+    <connectors>
+
+        <!-- Adobe Connect Pro
+        <connector>
+            <name>Adobe Connect Pro</name>
+            <class>AdobeConnectConnector</class>
+            <host>connect.cesnet.cz</host>
+            <port>443</port>
+            <auth>
+                <username>admin</username>
+                <password>(password)</password>
+            </auth>
+            <options>
+                # Request timeout
+                <timeout>PT10S</timeout>
+                # Capacity checking
+                <capacity-check-period>PT5M</capacity-check-period>
+                # Regex for extraction of path from url
+                <url-path-extraction-from-uri>connect\.cesnet\.cz/(.+)$</url-path-extraction-from-uri>
+                # Folders to be created on server
+                <recordings-folder-name>shongo-rec</recordings-folder-name>
+                <meetings-folder-name>shongo</meetings-folder-name>
+                # Recording configuration
+                <recordings-check-period>PT5M</recordings-check-period>
+                <recordings-prefix>rec_</recordings-prefix>
+            </options>
+        </connector>
+        -->
+
+        <!-- Cisco MCU
+        <connector>
+            <name>MCU</name>
+            <class>CiscoMCUConnector</class>
+            <host>mcuc.cesnet.cz</host>
+            <auth>
+                <username>admin</username>
+                <password>(password)</password>
+            </auth>
+            <options>
+                <timeout>PT30S</timeout>
+                <room-number-extraction-from-h323-number>(\d{3})$</room-number-extraction-from-h323-number>
+                <room-number-extraction-from-sip-uri>^[+\d]*(\d{3})@</room-number-extraction-from-sip-uri>
+                <participants>
+                    <participant>
+                        # Hide TCS participant (TCS)
+                        <address>950084999</address>
+                        <hide>true</hide>
+                    </participant>
+                </participants>
+                <alias-service>
+                    <name>ClearSea</name>
+                    <host>cs.cesnet.cz</host>
+                    <port>8181</port>
+                    <auth>
+                        <username>admin</username>
+                        <password>(password)</password>
+                    </auth>
+                    <gatekeeper></gatekeeper>
+                </alias-service>
+            </options>
+        </connector>
+        -->
+
+        <!-- Cisco TelePresence Content server
+        <connector>
+            <name>TelepresenceContent server</name>
+            <class>CiscoTCSConnector</class>
+            <host>195.113.151.188</host>
+            <port>80</port>
+            <auth>
+                <username>admin</username>
+                <password>(heslo)</password>
+            </auth>
+            <options>
+                # TCS settings
+                <tcs-recordings-drive>E</tcs-recordings-drive>
+                <tcs-free-space-low-limit>1024</tcs-free-space-low-limit>
+                # Recording settings
+                <default-bitrate>768</default-bitrate>
+                <alias>999</alias>
+                # Folder configuration
+                # UNIX format: /media/shongo
+                # WINDOWS format: c:/media/shongo
+                <storage>/media/shongo-dev/storage</storage>
+                <storage-permission>Require user ${userPrincipalName}</storage-permission>
+                <metadata-storage>/media/shongo-dev/metadata</metadata-storage>
+                <downloadable-url-base>https://shongo-auth-dev.cesnet.cz/tcs/shongo-dev/</downloadable-url-base>
+                # Recordings configuration
+                <check-recordings-period>PT5M</check-recordings-period>
+                <recordings-prefix>rec_</recordings-prefix>
+            </options>
+        </connector>
+         -->
+
+        <!-- instance
+        <connector>
+            # Agent name
+            <name>c90agent</name>
+            <class>CodecC90Connector</class>
+            # Device to be managed
+            <host>147.251.54.102</host>
+            <port>22</port>
+            <auth>
+                <username>admin</username>
+                <password>(password)</password>
+            </auth>
+            <options>
+                <timeout>PT30S</timeout>
+            </options>
+        </connector>
+        -->
+    </connectors>
+
+</configuration>

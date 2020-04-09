@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+    <definition name="layout" template="/WEB-INF/views/layout.jsp" preparer="cz.cesnet.shongo.client.web.LayoutViewPreparer">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="heading" value="title"/>
+        <put-attribute name="content" value=""/>
+        <put-list-attribute name="js">
+            <add-attribute value="jquery.min.js"/>
+            <add-attribute value="jquery-qtip.min.js"/>
+            <add-attribute value="bootstrap.min.js"/>
+        </put-list-attribute>
+        <put-list-attribute name="i18n">
+        </put-list-attribute>
+    </definition>
+
+    <definition name="layoutAngular" extends="layout">
+        <put-list-attribute name="js" inherit="true">
+            <add-attribute value="angular.min.js"/>
+            <add-attribute value="angular-application.js"/>
+            <add-attribute value="angular-cookies.min.js"/>
+            <add-attribute value="angular-datetime.js"/>
+            <add-attribute value="angular-extension.js"/>
+            <add-attribute value="angular-pagination.js"/>
+            <add-attribute value="angular-resource.min.js"/>
+            <add-attribute value="angular-sanitize.min.js"/>
+            <add-attribute value="angular-tooltip.js"/>
+            <add-attribute value="angular-ui-bootstrap.min.js"/>
+            <add-attribute value="re-tree.min.js"/>
+            <add-attribute value="angular-device-detector.min.js"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="layoutAngularForm" extends="layoutAngular">
+        <put-list-attribute name="js" inherit="true">
+            <add-attribute value="bootstrap-datetimepicker.min.js"/>
+            <add-attribute value="bootstrap-timepicker.min.js"/>
+            <add-attribute value="moment.min.js"/>
+            <add-attribute value="jquery-select2.min.js"/>
+            <add-attribute value="angular-ui-select2.js"/>
+        </put-list-attribute>
+        <put-list-attribute name="i18n" inherit="true">
+            <add-attribute value="bootstrap-datetimepicker"/>
+            <add-attribute value="bootstrap-timepicker"/>
+            <add-attribute value="jquery-select2"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="development" extends="layout">
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/development.jsp" type="template"/>
+    </definition>
+
+    <definition name="help" extends="layout">
+        <put-attribute name="title" value="views.help.title"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/help.jsp" type="template"/>
+    </definition>
+
+    <definition name="error" extends="layoutAngular">
+        <put-attribute name="title" value="views.error.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/error.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorNotFound" extends="layout">
+        <put-attribute name="title" value="views.errorNotFound.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/errorNotFound.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorAuthentication" extends="layout">
+        <put-attribute name="title" value="views.errorAuthentication.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/errorAuthentication.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorControllerNotAvailable" extends="layout">
+        <put-attribute name="title" value="views.errorControllerNotAvailable.title"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/errorControllerNotAvailable.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorRoomNotAvailable" extends="layout">
+        <put-attribute name="title" value="views.errorRoomNotAvailable.title"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/errorRoomNotAvailable.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorObjectInaccessible" extends="layout">
+        <put-attribute name="title" value="views.errorObjectInaccessible.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/errorObjectInaccessible.jsp" type="template"/>
+    </definition>
+
+    <definition name="errorPageInaccessible" extends="layout">
+        <put-attribute name="title" value="views.errorPageInaccessible.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/errorPageInaccessible.jsp" type="template"/>
+    </definition>
+
+    <definition name="report" extends="layoutAngular">
+        <put-attribute name="title" value="views.report.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/report.jsp" type="template"/>
+    </definition>
+
+    <definition name="userSettings" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.userSettings.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/userSettings.jsp" type="template"/>
+    </definition>
+
+    <definition name="indexAnonymous" extends="layout">
+        <put-attribute name="title" value="views.index.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/index.jsp" type="template"/>
+    </definition>
+    <definition name="indexAuthenticated" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.index.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/index.jsp" type="template"/>
+        <put-list-attribute name="js" inherit="true">
+            <add-attribute value="angular-calendar.js"/>
+            <add-attribute value="fullcalendar.min.js"/>
+            <add-attribute value="i18n/calendar/cs.js"/>
+            <add-attribute value="i18n/calendar/en-gb.js"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="changelog" extends="layout">
+        <put-attribute name="title" value="views.changelog.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/changelog.jsp" type="template"/>
+    </definition>
+
+    <definition name="userMessage" extends="layout">
+        <put-attribute name="title" expression="${titleCode}"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/userMessage.jsp" type="template"/>
+    </definition>
+
+    <definition name="wizard" extends="layoutAngularForm">
+        <put-attribute name="content" value="wizardBody" type="definition"/>
+        <put-attribute name="heading" value=""/>
+        <put-list-attribute name="title">
+            <add-attribute value="views.wizard.title"/>
+            <add-attribute expression="M(${wizardPageActive.titleCode}${wizardPageActive.titleArguments != null ? ',' : ''}${wizardPageActive.getTitleArgumentsAsString()})"/>
+            <add-attribute expression="T(${wizardPageActive.titleDescription})"/>
+        </put-list-attribute>
+    </definition>
+    <definition name="wizardBody" template="/WEB-INF/views/wizard.jsp">
+        <put-attribute name="content" value="wizardContent" type="definition"/>
+    </definition>
+    <definition name="wizardContent" templateExpression="${wizardContent}">
+    </definition>
+
+    <definition name="reservationRequestDelete" extends="layoutAngular">
+        <put-attribute name="content" value="/WEB-INF/views/reservationRequestDelete.jsp" type="template"/>
+        <put-list-attribute name="title">
+            <add-attribute expression="views.reservationRequestDelete${reservationRequestDeleteDetailList.size() >  1 ? 'Plural' : 'Singular' }.title"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="detail" extends="layoutAngularForm">
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/detail.jsp" type="template"/>
+        <put-list-attribute name="title">
+            <add-attribute value="views.detail.title"/>
+            <add-attribute expression="T(${titleDescription})"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="userRole" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.userRole.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/userRole.jsp" type="template"/>
+    </definition>
+
+    <definition name="roomList" extends="layoutAngular">
+        <put-attribute name="title" value="views.roomList.title"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/roomList.jsp" type="template"/>
+    </definition>
+
+    <definition name="participant" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.participant.title"/>
+        <put-attribute name="heading" value=""/>
+        <put-attribute name="content" value="/WEB-INF/views/participant.jsp" type="template"/>
+    </definition>
+
+    <definition name="resourceReservations" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceReservations.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceReservations.jsp" type="template"/>
+    </definition>
+
+    <definition name="resourceCapacityUtilization" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceCapacityUtilization.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceCapacityUtilization.jsp" type="template"/>
+    </definition>
+
+    <definition name="resourceCapacityUtilizationDescription" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceCapacityUtilizationDescription.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceCapacityUtilizationDescription.jsp" type="template"/>
+    </definition>
+
+    <definition name="resourceReservationRequestsConfirmation" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceReservationRequests.confirmation.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceReservationRequests.jsp" type="template"/>
+    </definition>
+
+    <definition name="resourceReservationRequestsConfirmationCalendar" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceReservationRequests.confirmation.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceReservationRequestsConfirmationCalendar.jsp" type="template"/>
+        <put-list-attribute name="js" inherit="true">
+            <add-attribute value="angular-calendar.js"/>
+            <add-attribute value="fullcalendar.min.js"/>
+            <add-attribute value="i18n/calendar/cs.js"/>
+            <add-attribute value="i18n/calendar/en-gb.js"/>
+        </put-list-attribute>
+    </definition>
+
+    <definition name="resourceReservationRequests" extends="layoutAngularForm">
+        <put-attribute name="title" value="views.resourceReservationRequests.confirmation.title"/>
+        <put-attribute name="content" value="/WEB-INF/views/resourceReservationRequests.jsp" type="template"/>
+    </definition>
+</tiles-definitions>

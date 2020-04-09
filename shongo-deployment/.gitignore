@@ -1,0 +1,8 @@
+backup/
+keystore/
+log/
+migrations/backup
+service/*.log
+service/*.pid
+shongo-*.xml
+root.access-token

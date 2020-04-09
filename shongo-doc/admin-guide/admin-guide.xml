@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<book>
+
+<title>Shongo Administrator Guide</title>
+<info>
+    <title>Shongo Administrator Guide</title>
+    <author>
+        <firstname>Martin</firstname>
+        <surname>Šrom</surname>
+    </author>
+    <author>
+        <firstname>Ondřej</firstname>
+        <surname>Pavelka</surname>
+    </author>
+</info>
+
+<!-- Includes -->
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="modules.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="installation.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="configuration.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="management.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="resources.xml"/>
+
+</book> 
+

@@ -1,0 +1,158 @@
+% Entries
+\newglossaryentry{g:shongo}
+{
+  name=Shongo,
+  description={Represents a distributed multimedia resource management system.}
+}
+\newglossaryentry{g:domain}
+{
+  name=domain,
+  description={Represents an administrative entity (an organization or its unit) which runs it's own \gls{g:shongo} \gls{g:controller} and which provides and controls some resources.}
+}
+\newglossaryentry{g:controller}
+{
+  name=controller,
+  description={Represents an application that holds a database of 
+    \glspl{g:resource}, \glspl{g:reservation-request} and \glspl{g:reservation} 
+    for a single \gls{g:domain}. \Glspl{g:user} can access and modify the database 
+    through a \gls{g:controller-client}. The controller runs a \gls{g:scheduler}
+    which allocates \glspl{g:reservation-request} to \glspl{g:reservation}.}
+}
+\newglossaryentry{g:controller-client}
+{
+  name=controller client,
+  description={Represents an application (e.g., command-line or web) which is able to
+    connect to a \gls{g:controller} and perform commands through the \gls{g:controller}'s API.}
+}
+\newglossaryentry{g:resource}
+{
+  name=resource,
+  description={An entity that can be requested for a reservation and allocated 
+  by a \gls{g:scheduler}.}
+}
+\newglossaryentry{g:device}
+{
+  name=device,
+  description={Represents a video/web conferencing hardware or software equipment
+   (e.g., H.323 terminal, H.323 MCU, Adobe Connect server, gateway or streaming server).}
+}
+\newglossaryentry{g:resource-device}
+{
+  name=device resource,
+  description={A special type of \gls{g:resource} that represents a \gls{g:device}.}
+}
+\newglossaryentry{g:reservation-request}
+{
+  name=reservation request,
+  description={A request that is made by an \gls{g:user} to book \gls{g:resource}(s)
+    for a specific date/time slot(s). Reservation request can be \emph{incomplete} 
+    or \emph{complete}. Incomplete requests must be filled in by 
+    additional information to become complete. \Gls{g:scheduler} processes only 
+    complete reservation requests.}
+}
+\newglossaryentry{g:reservation}
+{
+  name=reservation,
+  description={Represents allocated \gls{g:resource}(s) for a complete 
+    \gls{g:reservation-request}. \Glspl{g:reservation} are allocated by a \gls{g:scheduler}.}
+}
+\newglossaryentry{g:user}
+{
+  name=user,
+  description={Represents an authenticated person that can access a \gls{g:controller} 
+    through a \gls{g:controller-client}.}
+}
+\newglossaryentry{g:scheduler}
+{
+  name=scheduler,
+  description={Scheduler is a component of a \gls{g:controller} which processes 
+    complete \glspl{g:reservation-request} and allocates them to \glspl{g:reservation}.}
+}
+\newglossaryentry{g:connector}
+{
+  name=connector,
+  description={Represents an application that is composed of one or multiple \glspl{g:connector-agent}.}
+}
+\newglossaryentry{g:connector-agent}
+{
+  name=connector agent,
+  description={Represents a component that manages a single \gls{g:resource-device} 
+    and provides an API that allows the \gls{g:controller} to access that equipment.}
+}
+\newglossaryentry{g:technology}
+{
+  name=technology,
+  plural=technologies,
+  description={Represents a single video/web conferencing technology (e.g., 
+    H.323, SIP, or Adobe Connect).}
+}
+\newglossaryentry{g:compartment}
+{
+  name=compartment,
+  description={Represents a group of \glspl{g:endpoint} and/or persons which participates 
+    in a single video/web conference and the conference can spread out through multiple 
+    virtual rooms and even through multiple \glspl{g:technology} (when a gateway device is used).}
+}
+\newglossaryentry{g:endpoint}
+{
+  name=endpoint,
+  description={Represents a \gls{g:device} which can participate in a \gls{g:compartment} (e.g., a H.323 terminal or SIP client).}
+}
+\newglossaryentry{g:device-virtual-room}
+{
+  name=virtual room,
+  description={Represents a virtual room in a \gls{g:device} (e.g., virtual room in H.323 MCU).}
+}
+\newglossaryentry{g:device-alias}
+{
+  name=alias,
+  plural=aliases,
+  description={Represents an identifier that can be assigned to a \gls{g:device} and
+    which can be used to connect to the \gls{g:device} in a specific \gls{g:technology} 
+    (e.g., E.164 number in H.323 or URI in SIP).}
+}
+\newglossaryentry{g:device-connection}
+{
+  name=video conference call,
+  description={Represents a connection or call which is initiated by a 
+    \gls{g:device} to another \gls{g:device}.}
+}
+\newglossaryentry{g:executor}
+{
+  name=executor,
+  description={Executor is a component of a \gls{g:controller} which executes
+    allocated \glspl{g:executable} (e.g., \glspl{g:compartment} or \glspl{g:device-virtual-room})
+    from \glspl{g:reservation}. It creates all \glspl{g:device-virtual-room} on managed 
+    \glspl{g:resource-device} and establishes all \glspl{g:device-connection} between created 
+    \glspl{g:device-virtual-room} and managed \gls{g:endpoint} 
+    \glspl{g:resource-device}.}
+}
+\newglossaryentry{g:executable}
+{
+  name=executable,
+  description={Executable is an entity which can be executed by an \gls{g:executor} (e.g., \glspl{g:compartment} or \glspl{g:device-virtual-room}).}
+}
+\newglossaryentry{g:preprocessor}
+{
+  name=preprocessor,
+  description={Preprocessor is a component of a \gls{g:controller} which allocates
+    permanent \glspl{g:reservation-request} and creates single \glspl{g:reservation-request} 
+    from compound requests. Single \glspl{g:reservation-request} then can be allocated 
+    by the \gls{g:scheduler}.}
+}
+
+
+% Print glossaries
+\renewcommand*{\glossaryname}{List of Terms}  % Changes glossary name
+\renewcommand*{\glspostdescription}{}         % removes dot after description
+\renewcommand*{\glsnamefont}[1]{\textbf{#1}}  % makes name bold
+\renewcommand*{\arraystretch}{1.4}            % makes vertical space between entries
+                                              % add the table of contents entry
+\renewcommand*\glossarypreamble{\addcontentsline{toc}{chapter}{\glossaryname}}
+\setlength{\glspagelistwidth}{0.1\linewidth}
+\setlength\glsdescwidth{0.7\linewidth}        % sets width of descriptions
+\glsaddall                                    % add all glossaries
+\glossarystyle{long}                          % sets glossary style to table
+\renewcommand*{\glsgroupskip}{}               % remove vertical space between groups
+\printglossary[type=main]                     % print glossaries
+
