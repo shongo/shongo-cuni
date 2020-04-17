@@ -9,7 +9,6 @@ import cz.cesnet.shongo.controller.api.Group;
 import cz.cesnet.shongo.controller.api.SecurityToken;
 import cz.cesnet.shongo.report.ReportRuntimeException;
 import cz.cesnet.shongo.ssl.ConfiguredSSLContext;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -28,6 +27,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.*;
 import javax.persistence.EntityManagerFactory;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -81,6 +84,11 @@ public class ServerAuthorization extends Authorization
     private String authorizationServer;
 
     /**
+     * URL to LDAP authorization server.
+     */
+    private String ldapAuthorizationServer;
+
+    /**
      * Authorization header for requests.
      */
     private String requestAuthorizationHeader;
@@ -118,7 +126,12 @@ public class ServerAuthorization extends Authorization
         if (authorizationServer == null) {
             throw new IllegalStateException("Authorization server is not set in the configuration.");
         }
+        ldapAuthorizationServer = configuration.getString(ControllerConfiguration.SECURITY_LDAP_SERVER);
+        if (ldapAuthorizationServer == null) {
+            throw new IllegalStateException("LDAP authorization server is not set in the configuration.");
+        }
         logger.info("Using authorization server '{}'.", authorizationServer);
+        logger.info("Using LDAP authorization server '{}'.", ldapAuthorizationServer);
 
         // Authorization header
 
@@ -227,391 +240,203 @@ public class ServerAuthorization extends Authorization
     protected UserData onGetUserDataByUserId(final String userId)
             throws ControllerReportSet.UserNotExistsException
     {
-        return performGetRequest(authorizationServer + USER_SERVICE_PATH + "/" + userId,
-                "Retrieving user information by user-id '" + userId + "' failed",
-                new RequestHandler<UserData>()
-                {
-                    @Override
-                    public UserData success(JsonNode data)
-                    {
-                        if (data == null) {
-                            throw new ControllerReportSet.UserNotExistsException(userId);
-                        }
-                        return createUserDataFromWebServiceData(data);
-                    }
+        String filter = "uid=" + userId;
+        SearchControls ctrls = new SearchControls();
+        ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        ctrls.setCountLimit(1);
 
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == HttpStatus.SC_NOT_FOUND || detail.contains("UserNotExistsException")) {
-                            throw new ControllerReportSet.UserNotExistsException(userId);
-                        }
-                    }
-                });
+        DirContext ctx = null;
+        NamingEnumeration results = null;
+        UserData userData;
+
+        try {
+            ctx = getLdapContext();
+            results = ctx.search("", filter, ctrls);
+            if (results.hasMore()) {
+                SearchResult result = (SearchResult) results.next();
+                userData = createUserDataFromLdapData(result.getAttributes());
+            } else {
+                throw new ControllerReportSet.UserNotExistsException(userId);
+            }
+        } catch (NamingException e) {
+            throw new ControllerReportSet.UserNotExistsException(userId);
+        } finally {
+            try {
+                if (results != null) {
+                    results.close();
+                }
+                if (ctx != null) {
+                    ctx.close();
+                }
+            }
+            catch (Exception ignored) {
+                // Ignore.
+            }
+        }
+        return userData;
     }
 
     @Override
     protected String onGetUserIdByPrincipalName(final String principalName)
             throws ControllerReportSet.UserNotExistsException
     {
-        return performGetRequest(authorizationServer + PRINCIPAL_SERVICE_PATH + "/" + principalName,
-                "Retrieving user-id by principal name '" + principalName + "' failed",
-                new RequestHandler<String>()
-                {
-                    @Override
-                    public String success(JsonNode data)
-                    {
-                        if (data == null) {
-                            throw new ControllerReportSet.UserNotExistsException(principalName);
-                        }
-                        if (!data.has("id")) {
-                            throw new IllegalStateException("Principal service must return identifier.");
-                        }
-                        JsonNode dataId = data.get("id");
-                        if (dataId.isNull()) {
-                            throw new IllegalStateException("Principal service must return not null identifier.");
-                        }
-                        return dataId.asText();
-                    }
-
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == HttpStatus.SC_NOT_FOUND) {
-                            throw new ControllerReportSet.UserNotExistsException(principalName);
-                        }
-                    }
-                });
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected Collection<UserData> onListUserData(final Set<String> filterUserIds, String search)
     {
-        String listUsersUrlQuery = "";
+        StringBuilder filter = new StringBuilder();
+        SearchControls ctrls = new SearchControls();
+        ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+        DirContext ctx = null;
+        NamingEnumeration results = null;
+        List<UserData> userDataList = new LinkedList<>();
+
         if (filterUserIds != null && filterUserIds.size() > 0) {
-            String userIds = StringUtils.join(filterUserIds, ",");
-            listUsersUrlQuery += (listUsersUrlQuery.isEmpty() ? "?" : "&");
-            listUsersUrlQuery += "filter_user_id=" + userIds;
+            filter.append("(|");
+            for (String id : filterUserIds) {
+                filter.append("(uid=" + id + ")");
+            }
+            filter.append(")");
+        } else if (search != null) {
+            filter.append("(&(cn;lang-en=*" + search + "*)(uid=*))");
         }
-        if (search != null) {
+
+        try {
+            ctx = getLdapContext();
+            results = ctx.search("", filter.toString(), ctrls);
+            while (results.hasMore()) {
+                SearchResult result = (SearchResult) results.next();
+                // An alumn user
+                if (result.getAttributes().get("uid") != null) {
+                    userDataList.add(createUserDataFromLdapData(result.getAttributes()));
+                }
+            }
+        } catch (NamingException e) {
+            throw new CommonReportSet.UnknownErrorException(e, "Unable to list user data from LDAP.");
+        } finally {
             try {
-                listUsersUrlQuery += (listUsersUrlQuery.isEmpty() ? "?" : "&");
-                listUsersUrlQuery += "search=" + URLEncoder.encode(search, "UTF-8");
+                if (results != null) {
+                    results.close();
+                }
+                if (ctx != null) {
+                    ctx.close();
+                }
             }
-            catch (UnsupportedEncodingException exception) {
-                throw new CommonReportSet.UnknownErrorException(exception, "Url encoding failed");
+            catch (Exception ignored) {
+                // Ignore.
             }
         }
-        String listUsersUrl = authorizationServer + USER_SERVICE_PATH + listUsersUrlQuery;
-        final String listUsersSearch = search;
-        return performGetRequest(listUsersUrl, "Retrieving user information failed",
-                new RequestHandler<Collection<UserData>>()
-                {
-                    @Override
-                    public Collection<UserData> success(JsonNode data)
-                    {
-                        List<UserData> userDataList = new LinkedList<UserData>();
-                        if (data != null) {
-                            for (JsonNode childJsonNode : data.get("_embedded").get("users")) {
-                                UserData userData = createUserDataFromWebServiceData(childJsonNode);
-                                userDataList.add(userData);
-                            }
-                        }
-                        return userDataList;
-                    }
-
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        if (detail.contains("UserNotExistsException")) {
-                            String userId;
-                            int start = detail.lastIndexOf("id=");
-                            int end = -1;
-                            if (start != -1) {
-                                start += 3;
-                                end = detail.indexOf(" ", start);
-                            }
-                            if (start != -1 && end != -1) {
-                                userId = detail.substring(start, end);
-                            }
-                            else {
-                                userId = "<not-parsed>";
-                                logger.warn("User-id cannot be parsed from '{}'.", detail);
-                            }
-                            throw new ControllerReportSet.UserNotExistsException(userId);
-
-                        }
-                        else if (detail.startsWith("Invalid search string")) {
-                            throw new CommonReportSet.TypeIllegalValueException("search string", listUsersSearch);
-                        }
-                    }
-                });
+        return userDataList;
     }
 
     @Override
     protected Group onGetGroup(final String groupId) throws ControllerReportSet.GroupNotExistsException
     {
-        Group group = performGetRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId,
-                "Retrieving group " + groupId + " failed",
-                new RequestHandler<Group>()
-                {
-                    @Override
-                    public Group success(JsonNode data)
-                    {
-                        return createGroupFromWebServiceData(data);
-                    }
-
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == HttpStatus.SC_NOT_FOUND || detail.contains("GroupNotExistsException")) {
-                            throw new ControllerReportSet.GroupNotExistsException(groupId);
-                        }
-                    }
-                });
-
-        group.addAdministrators(getGroupAdministrators(groupId));
-        return group;
+        throw new ControllerReportSet.GroupNotExistsException(groupId);
     }
 
     @Override
     public List<Group> onListGroups(Set<String> filterGroupIds, Set<Group.Type> filterGroupTypes)
     {
-        String listGroupsUrlQuery = "";
-        if (filterGroupIds != null && filterGroupIds.size() > 0) {
-            String groupIds = StringUtils.join(filterGroupIds, ",");
-            listGroupsUrlQuery += (listGroupsUrlQuery.isEmpty() ? "?" : "&");
-            listGroupsUrlQuery += "filter_group_id=" + groupIds;
-        }
-        if (filterGroupTypes != null && filterGroupTypes.size() > 0) {
-            StringBuilder groupTypes = new StringBuilder();
-            for (Group.Type groupType : filterGroupTypes) {
-                String groupCode = groupType.toString().toLowerCase();
-                if (groupTypes.length() > 0) {
-                    groupTypes.append(",");
-                }
-                groupTypes.append(groupCode);
-            }
-            listGroupsUrlQuery += (listGroupsUrlQuery.isEmpty() ? "?" : "&");
-            listGroupsUrlQuery += "filter_type=" + groupTypes.toString();
-        }
-        String listGroupsUrl = authorizationServer + GROUP_SERVICE_PATH + listGroupsUrlQuery;
-        return performGetRequest(listGroupsUrl, "Retrieving groups failed", new RequestHandler<List<Group>>()
-        {
-            @Override
-            public List<Group> success(JsonNode data)
-            {
-                List<Group> groups = new LinkedList<Group>();
-                if (data != null) {
-                    Iterator<JsonNode> groupIterator = data.get("_embedded").get("groups").getElements();
-                    while (groupIterator.hasNext()) {
-                        JsonNode groupNode = groupIterator.next();
-                        groups.add(createGroupFromWebServiceData(groupNode));
-                    }
-                }
-                return groups;
-            }
-
-            @Override
-            public void error(StatusLine statusLine, String detail)
-            {
-                if (detail.contains("GroupNotExistsException")) {
-                    String userId;
-                    int start = detail.lastIndexOf("id=");
-                    int end = -1;
-                    if (start != -1) {
-                        start += 3;
-                        end = detail.indexOf(" ", start);
-                    }
-                    if (start != -1 && end != -1) {
-                        userId = detail.substring(start, end);
-                    }
-                    else {
-                        userId = "<not-parsed>";
-                        logger.warn("Group-id cannot be parsed from '{}'.", detail);
-                    }
-                    throw new ControllerReportSet.GroupNotExistsException(userId);
-                }
-            }
-        });
+        return new LinkedList<Group>();
     }
 
     @Override
     public Set<String> onListGroupUserIds(final String groupId)
     {
-        return performGetRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId + "/users",
-                "Retrieving user-ids in group " + groupId + " failed",
-                new RequestHandler<Set<String>>()
-                {
-                    @Override
-                    public Set<String> success(JsonNode data)
-                    {
-                        Set<String> userIds = new HashSet<String>();
-                        if (data != null) {
-                            Iterator<JsonNode> userIterator = data.get("_embedded").get("users").getElements();
-                            while (userIterator.hasNext()) {
-                                JsonNode userNode = userIterator.next();
-                                if (!userNode.has("id")) {
-                                    throw new IllegalStateException("User must have identifier.");
-                                }
-                                userIds.add(userNode.get("id").asText());
-                            }
-                        }
-                        return userIds;
-                    }
-                });
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected Set<String> onListUserGroupIds(String userId)
     {
-        String url = authorizationServer + USER_SERVICE_PATH + "/" + userId + "/groups?filter_type=user";
-        return performGetRequest(url,
-                "Retrieving group-ids for user " + userId + " failed",
-                new RequestHandler<Set<String>>()
-                {
-                    @Override
-                    public Set<String> success(JsonNode data)
-                    {
-                        Set<String> groupIds = new HashSet<String>();
-                        if (data != null) {
-                            Iterator<JsonNode> userIterator = data.get("_embedded").get("groups").getElements();
-                            while (userIterator.hasNext()) {
-                                JsonNode groupNode = userIterator.next();
-                                if (!groupNode.has("id")) {
-                                    throw new IllegalStateException("Group must have identifier.");
-                                }
-                                groupIds.add(groupNode.get("id").asText());
-                            }
-                        }
-                        return groupIds;
-                    }
-                });
+        return new HashSet<String>();
     }
 
     @Override
     public String onCreateGroup(final Group group)
     {
-        JsonNode groupData = createWebServiceDataFromGroup(group);
-        String groupId = performPostRequest(authorizationServer + GROUP_SERVICE_PATH, groupData,
-                "Creating group failed",
-                new RequestHandler<String>()
-                {
-                    @Override
-                    public String success(JsonNode data)
-                    {
-                        return data.get("id").asText();
-                    }
-
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        if (detail.contains("GroupExistsException")) {
-                            throw new ControllerReportSet.GroupAlreadyExistsException(group.getName());
-                        }
-                    }
-                });
-        group.setId(groupId);
-        modifyGroupAdministrators(group);
-        return groupId;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected void onModifyGroup(final Group group)
     {
-        JsonNode groupData = createWebServiceDataFromGroup(group);
-        String groupId = group.getId();
-        performPatchRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId, groupData,
-                "Creating group failed",
-                new RequestHandler<String>()
-                {
-                    @Override
-                    public String success(JsonNode data)
-                    {
-                        return data.get("id").asText();
-                    }
-
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        if (detail.contains("GroupExistsException")) {
-                            throw new ControllerReportSet.GroupAlreadyExistsException(group.getName());
-                        }
-                    }
-                });
-        modifyGroupAdministrators(group);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void onDeleteGroup(final String groupId)
     {
-        performDeleteRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId,
-                "Deleting group " + groupId + " failed",
-                new RequestHandler<Object>()
-                {
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        if (detail.contains("GroupNotExistsException")) {
-                            throw new ControllerReportSet.GroupNotExistsException(groupId);
-                        }
-                    }
-                });
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void onAddGroupUser(final String groupId, final String userId)
     {
-        performPutRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId + "/users/" + userId,
-                "Adding user " + userId + " to group " + groupId + " failed",
-                new RequestHandler<Object>()
-                {
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == HttpStatus.SC_NOT_FOUND) {
-                            if (detail.contains("User")) {
-                                throw new ControllerReportSet.UserNotExistsException(userId);
-                            }
-                        }
-                        if (detail.contains("AlreadyMemberException")) {
-                            throw new ControllerReportSet.UserAlreadyInGroupException(groupId, userId);
-                        }
-                        else if (detail.contains("GroupNotExistsException")) {
-                            throw new ControllerReportSet.GroupNotExistsException(groupId);
-                        }
-                    }
-                });
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void onRemoveGroupUser(final String groupId, final String userId)
     {
-        performDeleteRequest(authorizationServer + GROUP_SERVICE_PATH + "/" + groupId + "/users/" + userId,
-                "Removing user " + userId + " from group " + groupId + " failed",
-                new RequestHandler<Object>()
-                {
-                    @Override
-                    public void error(StatusLine statusLine, String detail)
-                    {
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == HttpStatus.SC_NOT_FOUND) {
-                            if (detail.contains("User")) {
-                                throw new ControllerReportSet.UserNotExistsException(userId);
-                            }
-                        }
-                        if (detail.contains("NotGroupMemberException")) {
-                            throw new ControllerReportSet.UserNotInGroupException(groupId, userId);
-                        }
-                        else if (detail.contains("GroupNotExistsException")) {
-                            throw new ControllerReportSet.GroupNotExistsException(groupId);
-                        }
-                    }
-                });
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Creates context with pooled connection for LDAP.
+     *
+     * @return {@link DirContext}
+     */
+    private DirContext getLdapContext() throws NamingException {
+        // LDAP client initialization
+        String ldapClientDn = configuration.getString(ControllerConfiguration.SECURITY_LDAP_BINDDN );
+        String ldapClientSecret = configuration.getString(ControllerConfiguration.SECURITY_LDAP_CLIENT_SECRET);
+        Hashtable<String,String> env = new Hashtable <String,String>();
+        env.put("com.sun.jndi.ldap.connect.pool", "true");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.PROVIDER_URL, ldapAuthorizationServer);
+        env.put(Context.SECURITY_PRINCIPAL, ldapClientDn);
+        env.put(Context.SECURITY_CREDENTIALS, ldapClientSecret);
+        return new InitialDirContext(env);
+    }
+
+    private UserData createUserDataFromLdapData(Attributes attributes) throws NamingException {
+
+        // Required fields
+        if (attributes.get("uid") == null) {
+            throw new IllegalArgumentException("User data must contain uid.");
+        }
+        if (attributes.get("sn") == null || attributes.get("givenname") == null) {
+            throw new IllegalArgumentException("User data must contain given and family name.");
+        }
+
+
+        String userId = (String) attributes.get("uid").get();
+        UserData userData = new UserData();
+        UserInformation userInformation = userData.getUserInformation();
+        userInformation.setUserId(userId);
+        userInformation.setFirstName((String) attributes.get("givenName").get());
+        userInformation.setLastName((String) attributes.get("sn").get());
+        Set<String> principalNames = new HashSet<>();
+        principalNames.add(userId + "@cuni.cz");
+        userInformation.setPrincipalNames(principalNames);
+/*        if (data.has("organization")) {
+            TODO : set faculty?
+            JsonNode organization = data.get("organization");
+            if (!organization.isNull()) {
+                userInformation.setOrganization(organization.getTextValue());
+            }
+        }*/
+        if (attributes.get("mail") != null) {
+            userInformation.setEmail((String) attributes.get("mail").get());
+        }
+        return userData;
     }
 
     /**
@@ -656,7 +481,7 @@ public class ServerAuthorization extends Authorization
      * @see #performRequest
      */
     private <T> T performPatchRequest(String url, JsonNode content, String description,
-            RequestHandler<T> requestHandler)
+                                      RequestHandler<T> requestHandler)
     {
         StringEntity entity;
         try {
@@ -832,7 +657,7 @@ public class ServerAuthorization extends Authorization
     private static UserData createUserDataFromWebServiceData(JsonNode data)
     {
         // Required fields
-        if (!data.has("id")) {
+        if (!data.has("principal_names")) {
             throw new IllegalArgumentException("User data must contain identifier.");
         }
         if (!data.has("first_name") || !data.has("last_name")) {
@@ -841,9 +666,25 @@ public class ServerAuthorization extends Authorization
 
         UserData userData = new UserData();
 
+        String userId = null;
+        JsonNode principalNames = data.get("principal_names");
+        if (principalNames.isArray()){
+            for (JsonNode principalNameNode : principalNames) {
+                String principalName = principalNameNode.getTextValue();
+                if (principalName.endsWith("@cuni.cz")) {
+                    userId = principalName.replace("@cuni.cz", "");
+                    break;
+                } else {
+                    // TODO: remove debug code folows
+                    //userId = "91550799";
+                    //throw new CommonReportSet.UnknownErrorException("Unable to parse cuniPersonalId from userData.");
+                }
+            }
+        }
+
         // Common user data
         UserInformation userInformation = userData.getUserInformation();
-        userInformation.setUserId(data.get("id").asText());
+        userInformation.setUserId(userId);
         userInformation.setFirstName(data.get("first_name").getTextValue());
         userInformation.setLastName(data.get("last_name").getTextValue());
         if (data.has("organization")) {
@@ -890,19 +731,19 @@ public class ServerAuthorization extends Authorization
         }
         // for AuthN Server v0.6.4 and newer
         if (data.has("authn_provider") && data.has("authn_instant") && data.has("loa")) {
-                userData.setUserAuthorizationData(new UserAuthorizationData(
-                        data.get("authn_provider").getTextValue(),
-                        DateTime.parse(data.get("authn_instant").getTextValue()),
-                        data.get("loa").getIntValue()));
+            userData.setUserAuthorizationData(new UserAuthorizationData(
+                    data.get("authn_provider").getTextValue(),
+                    DateTime.parse(data.get("authn_instant").getTextValue()),
+                    data.get("loa").getIntValue()));
         }
         // for AuthN Server v0.6.3 and older
         if (data.has("authentication_info")) {
             JsonNode authenticationInfo = data.get("authentication_info");
             if (authenticationInfo.has("provider") && authenticationInfo.has("loa")) {
                 userData.setUserAuthorizationData(new UserAuthorizationData(
-                    authenticationInfo.get("provider").getTextValue(),
-                    null,
-                    authenticationInfo.get("loa").getIntValue()));
+                        authenticationInfo.get("provider").getTextValue(),
+                        null,
+                        authenticationInfo.get("loa").getIntValue()));
             }
         }
 
@@ -1074,7 +915,7 @@ public class ServerAuthorization extends Authorization
      * @throws IllegalStateException when other {@link Authorization} already exists
      */
     public static ServerAuthorization createInstance(ControllerConfiguration configuration,
-            EntityManagerFactory entityManagerFactory) throws IllegalStateException
+                                                     EntityManagerFactory entityManagerFactory) throws IllegalStateException
     {
         ServerAuthorization serverAuthorization = new ServerAuthorization(configuration, entityManagerFactory);
         Authorization.setInstance(serverAuthorization);

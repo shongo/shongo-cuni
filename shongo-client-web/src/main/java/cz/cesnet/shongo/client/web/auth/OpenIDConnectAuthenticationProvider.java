@@ -74,12 +74,10 @@ public class OpenIDConnectAuthenticationProvider implements AuthenticationProvid
                 try {
                     ObjectMapper jsonMapper = new ObjectMapper();
                     userInfoResponse = jsonMapper.readTree(inputStream);
-                }
-                finally {
+                } finally {
                     inputStream.close();
                 }
-            }
-            catch (IOException exception) {
+            } catch (IOException exception) {
                 throw new AuthenticationServiceException("Unable to obtain user information.", exception);
             }
             // Handle error
@@ -93,10 +91,23 @@ public class OpenIDConnectAuthenticationProvider implements AuthenticationProvid
             if (!userInfoResponse.has("id")) {
                 throw new AuthenticationServiceException("Token endpoint did not return an access_token.");
             }
+            if (!userInfoResponse.has("original_id")) {
+                throw new AuthenticationServiceException("Token endpoint did not return original_id.");
+            }
+
+            // Parse cuniPersonalId
+            String userId;
+
+            String originalId = userInfoResponse.get("original_id").getTextValue();
+            if (!originalId.endsWith("@cuni.cz")) {
+                throw new AuthenticationServiceException("Unable to parse cuniPersonalId from original_id.");
+            } else {
+                userId = originalId.replace("@cuni.cz", "");
+            }
 
             // Build user info
             UserInformation userInformation = new UserInformation();
-            userInformation.setUserId(userInfoResponse.get("id").asText());
+            userInformation.setUserId(userId);
             userInformation.setFirstName(userInfoResponse.get("first_name").getTextValue());
             userInformation.setLastName(userInfoResponse.get("last_name").getTextValue());
             if (userInfoResponse.has("original_id")) {
