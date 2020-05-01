@@ -904,7 +904,9 @@
             </div>
         </div>
     </c:if>--%>
-    <form:input type="hidden" value="2120-05-03" cssClass="form-control" cssErrorClass="form-control error" path="end" date-time-picker="true" format="date" tabindex="${tabIndex}"/>
+    <c:if test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
+        <form:input type="hidden" value="2120-05-03" cssClass="form-control" cssErrorClass="form-control error" path="end" date-time-picker="true" format="date" tabindex="${tabIndex}"/>
+    </c:if>
 
     <c:if test="${reservationRequest.specificationType != 'PERMANENT_ROOM'}">
         <div class="form-group">
