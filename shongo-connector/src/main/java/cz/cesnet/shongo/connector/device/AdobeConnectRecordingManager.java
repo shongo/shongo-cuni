@@ -313,7 +313,7 @@ public class AdobeConnectRecordingManager
      */
     public void deleteRecordingFolder(String recordingFolderId) throws CommandException
     {
-        connector.deleteSCO(recordingFolderId);
+        //connector.deleteSCO(recordingFolderId);
     }
 
     /**
@@ -479,7 +479,7 @@ public class AdobeConnectRecordingManager
      */
     public void deleteRecording(String recordingId) throws CommandException
     {
-        connector.deleteSCO(recordingId);
+        //connector.deleteSCO(recordingId);
     }
 
     /**

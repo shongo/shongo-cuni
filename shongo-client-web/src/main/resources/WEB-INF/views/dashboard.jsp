@@ -93,7 +93,7 @@
             <ul>
                 <c:if test="${!showOnlyMeetingRooms}">
                     <li>
-                        <tag:url var="createRoomUrl" value="<%= ClientWebUrl.WIZARD_ROOM %>">
+                        <tag:url var="createRoomUrl" value="<%= ClientWebUrl.WIZARD_ROOM_PERMANENT %>">
                             <tag:param name="back-url" value="${requestScope.requestUrl}"/>
                         </tag:url>
                         <a href="${createRoomUrl}" tabindex="1">

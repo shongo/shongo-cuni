@@ -71,7 +71,7 @@ public class UserSettingsManager
         }
         else {
             // Default values
-            userSettingsApi.setUseWebService(true);
+            userSettingsApi.setUseWebService(false);
             userSettingsApi.setSystemAdministratorNotifications(true);
             userSettingsApi.setResourceAdministratorNotifications(true);
         }

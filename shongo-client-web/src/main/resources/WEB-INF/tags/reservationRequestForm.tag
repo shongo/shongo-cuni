@@ -561,12 +561,8 @@
                 </form:label>
                 <div class="col-xs-4">
                     <form:select cssClass="form-control" path="technology" ng-model="technology" tabindex="${tabIndex}">
-                        <spring:eval var="technologies" expression="T(cz.cesnet.shongo.client.web.models.TechnologyModel).values()"/>
-                        <c:forEach var="technology" items="${technologies}">
-                            <c:if test="${technology != 'H323_SIP'}">
-                                <form:option value="${technology}"><spring:message code="${technology.titleCode}"/></form:option>
-                            </c:if>
-                        </c:forEach>
+                        <spring:eval var="technology" expression="T(cz.cesnet.shongo.client.web.models.TechnologyModel).ADOBE_CONNECT"/>
+                        <form:option  value="${technology}"><spring:message code="${technology.titleCode}"/></form:option>
                     </form:select>
                     <form:errors path="technology" cssClass="error"/>
                 </div>
@@ -893,21 +889,22 @@
         </div>
     </div>
 
-    <c:if test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
+<%--    <c:if test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
         <div class="form-group">
             <form:label class="col-xs-3 control-label" path="end">
                 <spring:message code="views.reservationRequest.end"/>:
             </form:label>
             <div class="col-xs-9 space-padding">
                     <div class="col-xs-2">
-                        <form:input cssClass="form-control" cssErrorClass="form-control error" path="end" date-time-picker="true" format="date" tabindex="${tabIndex}"/>
+
                     </div>
                 </div>
             <div class="col-xs-offset-3 col-xs-9">
                 <form:errors path="end" cssClass="error"/>
             </div>
         </div>
-    </c:if>
+    </c:if>--%>
+    <form:input type="hidden" value="2120-05-03" cssClass="form-control" cssErrorClass="form-control error" path="end" date-time-picker="true" format="date" tabindex="${tabIndex}"/>
 
     <c:if test="${reservationRequest.specificationType != 'PERMANENT_ROOM'}">
         <div class="form-group">

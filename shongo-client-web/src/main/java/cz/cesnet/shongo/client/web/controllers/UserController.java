@@ -110,7 +110,7 @@ public class UserController
             HttpServletRequest request,
             @ModelAttribute("userSettings") UserSettingsModel userSettings)
     {
-
+        userSettings.setUseWebService(false);
         authorizationService.updateUserSettings(securityToken, userSettings.toApi());
         cache.clearUserPermissions(securityToken);
         if (userSettings.isUseWebService()) {

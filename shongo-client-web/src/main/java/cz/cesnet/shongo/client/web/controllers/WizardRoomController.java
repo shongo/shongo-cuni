@@ -79,9 +79,6 @@ public class WizardRoomController extends WizardParticipantsController
         }
         else if (reservationRequest != null && SpecificationType.MEETING_ROOM.equals(reservationRequest.getSpecificationType())) {
             wizardView.addPage(new WizardPage(Page.SELECT, null, "views.wizard.page.meetingRoom.book"));
-        } else {
-            wizardView.addPage(new WizardPage(Page.SELECT, ClientWebUrl.WIZARD_ROOM,
-                    "views.wizard.page.room.create"));
         }
 
         wizardView.addPage(new WizardPage(Page.ATTRIBUTES, ClientWebUrl.WIZARD_ROOM_ATTRIBUTES,
@@ -118,7 +115,7 @@ public class WizardRoomController extends WizardParticipantsController
     /**
      * Book new room.
      */
-    @RequestMapping(value = ClientWebUrl.WIZARD_ROOM, method = RequestMethod.GET)
+/*    @RequestMapping(value = ClientWebUrl.WIZARD_ROOM, method = RequestMethod.GET)
     public ModelAndView handleRoomType(SecurityToken securityToken)
     {
         WizardView wizardView = getWizardView(Page.SELECT, "wizardRoomType.jsp");
@@ -128,12 +125,12 @@ public class WizardRoomController extends WizardParticipantsController
         wizardView.addAction(ClientWebUrl.WIZARD_ROOM_CANCEL,
                 "views.button.cancel", WizardView.ActionPosition.LEFT);
         return wizardView;
-    }
+    }*/
 
     /**
      * Change new virtual room to ad-hoc type and show form for editing room attributes.
      */
-    @RequestMapping(value = ClientWebUrl.WIZARD_ROOM_ADHOC, method = RequestMethod.GET)
+/*    @RequestMapping(value = ClientWebUrl.WIZARD_ROOM_ADHOC, method = RequestMethod.GET)
     public String handleAdhocRoom(
             SecurityToken securityToken,
             UserSession userSession,
@@ -167,7 +164,7 @@ public class WizardRoomController extends WizardParticipantsController
         else {
             return "redirect:" + BackUrl.getInstance(request).applyToUrl(ClientWebUrl.WIZARD_ROOM_ATTRIBUTES);
         }
-    }
+    }*/
 
     /**
      * Change new virtual room to permanent type and show form for editing room attributes.
@@ -183,6 +180,7 @@ public class WizardRoomController extends WizardParticipantsController
             }
         }
         reservationRequest.setSpecificationType(SpecificationType.PERMANENT_ROOM);
+        reservationRequest.setTechnology(TechnologyModel.ADOBE_CONNECT);
         return "redirect:" + BackUrl.getInstance(request).applyToUrl(ClientWebUrl.WIZARD_ROOM_ATTRIBUTES);
     }
 
@@ -388,6 +386,7 @@ public class WizardRoomController extends WizardParticipantsController
         }
         // Set valid startDate to be in the future
         reservationRequest.updateSlotStartToFutureSlot();
+
 
         ReservationRequestValidator validator = new ReservationRequestValidator(
                 securityToken, reservationService, cache, userSession.getLocale(), userSession.getTimeZone());
@@ -815,8 +814,8 @@ public class WizardRoomController extends WizardParticipantsController
     @ExceptionHandler({HttpSessionRequiredException.class, IllegalStateException.class})
     public Object handleExceptions(Exception exception)
     {
-        logger.warn("Redirecting to " + ClientWebUrl.WIZARD_ROOM + ".", exception);
-        return "redirect:" + ClientWebUrl.WIZARD_ROOM;
+        logger.warn("Redirecting to " + ClientWebUrl.WIZARD_ROOM_PERMANENT + ".", exception);
+        return "redirect:" + ClientWebUrl.WIZARD_ROOM_PERMANENT;
     }
 
     /**

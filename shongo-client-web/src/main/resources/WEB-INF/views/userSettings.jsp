@@ -67,7 +67,7 @@ Alternative: https://einfra.cesnet.cz/perun-gui/#usr/info?active=1
         </div>
     </div>
 
-    <div class="form-group">
+    <div style="display: none" class="form-group">
         <form:label class="col-xs-3 control-label" path="useWebService">
             <spring:message code="views.userSettings.useWebService" var="useWebServiceLabel"/>
             <tag:help label="${useWebServiceLabel}:" selectable="true">
@@ -81,6 +81,8 @@ Alternative: https://einfra.cesnet.cz/perun-gui/#usr/info?active=1
             <a class="btn btn-default" href="${webServiceUrl}" target="_blank"><spring:message code="views.userSettings.useWebService.edit"/></a>
         </div>
     </div>
+<%--    <form:checkbox cssStyle="display: none" path="useWebService" tabindex="${tabIndex}" ng-model="useWebService"/>--%>
+
 
     <div class="form-group">
         <form:label class="col-xs-3 control-label" path="locale">

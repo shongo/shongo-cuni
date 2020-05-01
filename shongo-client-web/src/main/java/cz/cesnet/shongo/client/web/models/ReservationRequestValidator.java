@@ -201,9 +201,9 @@ public class ReservationRequestValidator implements Validator
                     validateInterval(reservationRequestModel, errors);
                     ValidationUtils.rejectIfEmptyOrWhitespace(errors, "roomName", "validation.field.required");
                     validateIdentifier("roomName", errors);
-                    if (TechnologyModel.H323_SIP.equals(reservationRequestModel.getTechnology())) {
-                        validateE164Number("e164Number", errors);
-                    }
+                        if (TechnologyModel.H323_SIP.equals(reservationRequestModel.getTechnology())) {
+                            validateE164Number("e164Number", errors);
+                        }
                     break;
             }
         }
