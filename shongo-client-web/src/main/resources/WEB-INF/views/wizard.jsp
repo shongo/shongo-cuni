@@ -23,7 +23,7 @@
             </c:choose>
             <c:choose>
                 <c:when test="${wizardPage.url != null && wizardPage.available}">
-                    <a href="${wizardPage.url}" class="${classLink}">
+                    <a href="${contextPath}${wizardPage.url}" class="${classLink}">
                         <span class="${classBadge}">${wizardPageStatus.index + 1}</span>
                         <spring:message code="${wizardPage.titleCode}" arguments="${wizardPage.titleArguments}"/>
                     </a>
