@@ -295,7 +295,10 @@ public class ServerAuthorization extends Authorization
                 SearchResult result = (SearchResult) results.next();
                 // An alumn user
                 if (result.getAttributes().get("uid") != null) {
-                    userDataList.add(createUserDataFromLdapData(result.getAttributes()));
+                    UserData userData = createUserDataFromLdapData(result.getAttributes());
+                    if (userData != null) {
+                        userDataList.add(userData);
+                    }
                 }
             }
         } catch (NamingException e) {
@@ -390,14 +393,20 @@ public class ServerAuthorization extends Authorization
         return new InitialDirContext(env);
     }
 
+    /**
+     * Returns userData if parsing went well. If name is not set properly returns null.
+     *
+     * @return {@link UserData}
+     */
     private UserData createUserDataFromLdapData(Attributes attributes) throws NamingException {
 
         // Required fields
         if (attributes.get("uid") == null) {
             throw new IllegalArgumentException("User data must contain uid.");
         }
+        // Ignore if not set
         if (attributes.get("sn") == null || attributes.get("givenname") == null) {
-            throw new IllegalArgumentException("User data must contain given and family name.");
+            return null;
         }
 
 

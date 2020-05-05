@@ -83,8 +83,8 @@
                             text += " " + user.lastName;
                         }
                         text += "</b>";
-                        if ( user.organization != null ) {
-                            text += " (" + user.organization + ")";
+                        if ( user.email != null ) {
+                            text += " (" + user.email + ")";
                         }
                         return text;
                     };
@@ -187,7 +187,7 @@
         </div>
     </c:if>
 
-    <div class="form-group">
+<%--    <div class="form-group">
         <form:label class="col-xs-3 control-label" path="identityType">
             <spring:message code="views.userRole.identityType"/>:
         </form:label>
@@ -201,7 +201,8 @@
                 <span><spring:message code="views.userRole.identityType.GROUP"/></span>
             </label>
         </div>
-    </div>
+    </div>--%>
+    <form:input type="hidden" path="identityType" ng-model="identityType" value="USER"></form:input>
 
     <div class="form-group">
         <form:label class="col-xs-3 control-label" path="identityPrincipalId">
