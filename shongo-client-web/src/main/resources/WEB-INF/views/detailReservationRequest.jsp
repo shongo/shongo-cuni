@@ -13,7 +13,7 @@
     <c:set var="canCreatePermanentRoomCapacity" value="${false}"/>
 </c:if>
 
-<tag:url var="detailUrl" value="<%= ClientWebUrl.DETAIL_VIEW %>"/>
+<c:set var="detailUrl" value="<%= ClientWebUrl.DETAIL_VIEW %>"/>
 
 <script type="text/javascript">
     function DetailReservationRequestController($scope) {
