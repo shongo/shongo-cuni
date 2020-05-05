@@ -116,9 +116,10 @@
             </c:if>
             </tbody>
         </table>
+        <tag:url var="createUrlTag" value="${createUrl}"></tag:url>
         <c:if test="${isWritable && createUrl != null}">
             <div class="table-actions">
-                <a class="btn btn-primary" href="${createUrl}">
+                <a class="btn btn-primary" href="${createUrlTag}">
                     <spring:message code="views.button.add"/>
                 </a>
             </div>
