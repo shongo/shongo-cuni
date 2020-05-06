@@ -264,7 +264,13 @@ public class ServerAuthorization extends Authorization
     protected String onGetUserIdByPrincipalName(final String principalName)
             throws ControllerReportSet.UserNotExistsException
     {
-        throw new UnsupportedOperationException();
+        String userId;
+        if (principalName.endsWith("@cuni.cz")) {
+            userId = principalName.replace("@cuni.cz", "");
+        } else {
+            throw new IllegalArgumentException("Invalid format of principal name: " + principalName);
+        }
+        return userId;
     }
 
     @Override
