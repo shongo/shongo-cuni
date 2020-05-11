@@ -50,8 +50,8 @@
                     text += " " + user.lastName;
                 }
                 text += "</b>";
-                if ( user.organization != null ) {
-                    text += " (" + user.organization + ")";
+                if ( user.email != null ) {
+                    text += " (" + user.email + ")";
                 }
                 return text;
             };

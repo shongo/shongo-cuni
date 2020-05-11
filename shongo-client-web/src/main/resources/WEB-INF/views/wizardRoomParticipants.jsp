@@ -9,9 +9,9 @@
 
 <c:set var="tabIndex" value="1"/>
 
-<tag:url var="createUrl" value="${createUrl}"/>
-<tag:url var="modifyUrl" value="${modifyUrl}"/>
-<tag:url var="deleteUrl" value="${deleteUrl}"/>
+<c:set var="createUrl" value="${createUrl}"/>
+<c:set var="modifyUrl" value="${modifyUrl}"/>
+<c:set var="deleteUrl" value="${deleteUrl}"/>
 
 <script type="text/javascript">
     var module = angular.module('jsp:wizardRoomParticipants', ['ngApplication', 'ngTooltip']);
@@ -85,9 +85,9 @@
     </c:choose>
 
     <tag:participantList data="${reservationRequest.roomParticipants}"
-                         createUrl="javascript: redirect('${createUrl}')"
-                         modifyUrl="javascript: redirect('${modifyUrl}')"
-                         deleteUrl="javascript: redirect('${deleteUrl}')"
+                         createUrl="${createUrl}"
+                         modifyUrl="${modifyUrl}"
+                         deleteUrl="${deleteUrl}"
                          hideRole="${reservationRequest.technology == 'H323_SIP'}"/>
 
     <hr/>
