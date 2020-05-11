@@ -88,7 +88,7 @@
             </table>
             <c:if test="${isWritable && createUrl != null}">
                 <div class="table-actions">
-                    <a class="btn btn-primary" href="${createUrl}">
+                    <a class="btn btn-primary" href="<tag:url var="createUrlTag" value="${createUrl}"></tag:url>">
                         <spring:message code="views.button.add"/>
                     </a>
                 </div>
@@ -146,7 +146,7 @@
                 </table>
                 <c:if test="${isWritable && createUrl != null}">
                     <div class="table-actions">
-                        <a class="btn btn-primary" href="${createUrl}" tabindex="1">
+                        <a class="btn btn-primary" href="<tag:url var="createUrlTag" value="${createUrl}"></tag:url>" tabindex="1">
                             <spring:message code="views.button.add"/>
                         </a>
                     </div>
