@@ -186,7 +186,21 @@ public class ServerAuthorization extends Authorization
                 if (jsonNode == null) {
                     throw new ControllerReportSet.UserNotExistsException(accessToken);
                 }
-                return createUserDataFromWebServiceData(jsonNode);
+                String userId = getIdFromOIDCResponse(jsonNode);
+                Collection<UserInformation> userInformationCollection = this.listUserInformation(new HashSet<String>(Arrays.asList(userId)), null);
+                Iterator<UserInformation> iterator = userInformationCollection.iterator();
+                if (!iterator.hasNext()) {
+                    throw new ControllerReportSet.UserNotExistsException(userId);
+                }
+                UserInformation ldapUserInformation = iterator.next();
+                UserData userData = new UserData();
+                UserInformation newUserInformation = userData.getUserInformation();
+                newUserInformation.setUserId(ldapUserInformation.getUserId());
+                newUserInformation.setFirstName(ldapUserInformation.getFirstName());
+                newUserInformation.setLastName(ldapUserInformation.getLastName());
+                newUserInformation.setPrincipalNames(ldapUserInformation.getPrincipalNames());
+                newUserInformation.setEmail(ldapUserInformation.getEmail());
+                return userData;
             }
             else {
                 JsonNode jsonNode = readJson(response.getEntity());
@@ -218,6 +232,23 @@ public class ServerAuthorization extends Authorization
             errorMessage += " " + errorReason;
         }
         throw new RuntimeException(errorMessage, errorException);
+    }
+
+    protected String getIdFromOIDCResponse (JsonNode jsonNode) {
+        if (!jsonNode.has("original_id")) {
+            throw new IllegalArgumentException("Token endpoint did not return original_id.");
+        }
+
+        // Parse cuniPersonalId
+        String userId;
+
+        String originalId = jsonNode.get("original_id").getTextValue();
+        if (!originalId.endsWith("@cuni.cz")) {
+            throw new IllegalArgumentException("Unable to parse cuniPersonalId from original_id.");
+        } else {
+            userId = originalId.replace("@cuni.cz", "");
+        }
+        return userId;
     }
 
     @Override

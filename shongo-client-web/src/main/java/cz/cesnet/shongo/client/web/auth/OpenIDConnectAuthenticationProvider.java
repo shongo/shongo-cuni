@@ -4,6 +4,8 @@ import cz.cesnet.shongo.api.UserInformation;
 import cz.cesnet.shongo.client.web.ClientWebConfiguration;
 import cz.cesnet.shongo.controller.api.SecurityToken;
 import cz.cesnet.shongo.controller.api.UserSettings;
+import cz.cesnet.shongo.controller.api.request.ListResponse;
+import cz.cesnet.shongo.controller.api.request.UserListRequest;
 import cz.cesnet.shongo.controller.api.rpc.AuthorizationService;
 import cz.cesnet.shongo.ssl.ConfiguredSSLContext;
 import org.apache.http.HttpResponse;
@@ -37,13 +39,21 @@ public class OpenIDConnectAuthenticationProvider implements AuthenticationProvid
     private ClientWebConfiguration configuration;
 
     /**
+     * @see AuthorizationService
+     */
+    private AuthorizationService authorizationService;
+
+
+    /**
      * Constructor.
      *
      * @param configuration sets the {@link #configuration}
      */
-    public OpenIDConnectAuthenticationProvider(ClientWebConfiguration configuration)
+    public OpenIDConnectAuthenticationProvider(ClientWebConfiguration configuration,
+                                               AuthorizationService authorizationService)
     {
         this.configuration = configuration;
+        this.authorizationService = authorizationService;
     }
 
     @Override
@@ -106,7 +116,13 @@ public class OpenIDConnectAuthenticationProvider implements AuthenticationProvid
             }
 
             // Build user info
-            UserInformation userInformation = new UserInformation();
+            ListResponse<UserInformation> userInformationList = authorizationService.listUsers(new UserListRequest(securityToken, userId));
+            if (userInformationList.getItemCount() != 1) {
+                throw new AuthenticationServiceException("Unable to fetch user information from LDAP");
+            }
+
+            UserInformation userInformation = userInformationList.getItem(0);
+            /*UserInformation userInformation = new UserInformation();
             userInformation.setUserId(userId);
             userInformation.setFirstName(userInfoResponse.get("first_name").getTextValue());
             userInformation.setLastName(userInfoResponse.get("last_name").getTextValue());
@@ -118,7 +134,7 @@ public class OpenIDConnectAuthenticationProvider implements AuthenticationProvid
             }
             if (userInfoResponse.has("mail")) {
                 userInformation.setEmail(userInfoResponse.get("mail").getTextValue());
-            }
+            }*/
             securityToken.setUserInformation(userInformation);
 
             logger.info("{} authenticated.", userInformation);
