@@ -152,7 +152,15 @@
     <%-- Requested/allocated time slot --%>
     <c:choose>
         <c:when test="${reservationRequest.detail != null && reservationRequest.detail.allocationState == 'ALLOCATED' && reservationRequest.detail.room != null}">
-            <dt><spring:message code="views.reservationRequest.room.slot"/>:</dt>
+            <c:choose>
+                <c:when test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
+                    <dt><spring:message code="views.reservationRequest.room.slot.PERMANENT"/>:</dt>
+                </c:when>
+                <c:otherwise>
+                    <dt><spring:message code="views.reservationRequest.room.slot"/>:</dt>
+                </c:otherwise>
+            </c:choose>
+
             <dd><tag:format value="${reservationRequest.detail.room.slot}" multiline="true" pre="${reservationRequest.detail.room.slotBefore}" post="${reservationRequest.detail.room.slotAfter}"/></dd>
         </c:when>
         <c:otherwise>
