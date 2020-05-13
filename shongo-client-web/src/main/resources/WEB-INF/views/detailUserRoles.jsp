@@ -9,14 +9,9 @@
 <tag:url var="userRoleDataUrl" value="<%= ClientWebUrl.DETAIL_USER_ROLES_DATA %>">
     <tag:param name="objectId" value=":id"/>
 </tag:url>
-<tag:url var="userRoleCreateUrl" value="<%= ClientWebUrl.DETAIL_USER_ROLE_CREATE %>">
-    <tag:param name="objectId" value="${objectId}"/>
-    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
-</tag:url>
-<tag:url var="userRoleDeleteUrl" value="<%= ClientWebUrl.DETAIL_USER_ROLE_DELETE %>">
-    <tag:param name="objectId" value="${objectId}"/>
-    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
-</tag:url>
+<c:set var="userRoleCreateUrl" value="<%= ClientWebUrl.DETAIL_USER_ROLE_CREATE %>"/>
+<c:set var="userRoleDeleteUrl" value="<%= ClientWebUrl.DETAIL_USER_ROLE_DELETE %>"/>
+
 <tag:userRoleList dataUrl="${userRoleDataUrl}" dataUrlParameters="id: '${reservationRequestId}'"
                   createUrl="${userRoleCreateUrl}" deleteUrl="${userRoleDeleteUrl}">
 

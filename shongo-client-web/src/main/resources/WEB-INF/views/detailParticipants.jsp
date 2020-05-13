@@ -11,18 +11,10 @@
 <tag:url var="participantDataUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANTS_DATA %>">
     <tag:param name="objectId" value=":id"/>
 </tag:url>
-<tag:url var="participantCreateUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_CREATE %>">
-    <tag:param name="objectId" value="${objectId}"/>
-    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
-</tag:url>
-<tag:url var="participantModifyUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_MODIFY %>">
-    <tag:param name="objectId" value="${objectId}"/>
-    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
-</tag:url>
-<tag:url var="participantDeleteUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_DELETE %>">
-    <tag:param name="objectId" value="${objectId}"/>
-    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
-</tag:url>
+<c:set var="participantCreateUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_CREATE %>"/>
+<c:set var="participantModifyUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_MODIFY %>"/>
+<c:set var="participantDeleteUrl" value="<%= ClientWebUrl.DETAIL_PARTICIPANT_DELETE %>"/>
+
 <tag:participantList dataUrl="${participantDataUrl}" dataUrlParameters="id: '${objectId}'"
                      createUrl="${participantCreateUrl}" modifyUrl="${participantModifyUrl}"
                      deleteUrl="${participantDeleteUrl}"

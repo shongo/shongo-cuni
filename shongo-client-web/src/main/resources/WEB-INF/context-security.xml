@@ -95,6 +95,7 @@
     <!-- Create authentication provider for OpenID Connect -->
     <bean id="authenticationProvider" class="cz.cesnet.shongo.client.web.auth.OpenIDConnectAuthenticationProvider">
         <constructor-arg ref="configuration"/>
+        <constructor-arg ref="controllerAuthorizationService"/>
     </bean>
 
 </beans>

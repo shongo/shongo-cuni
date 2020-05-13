@@ -14,6 +14,13 @@
 <%@attribute name="deleteUrl" required="false" %>
 <%@attribute name="hideRole" required="false" type="java.lang.Boolean" %>
 
+<tag:url var="createUrlTag" value="${createUrl}">
+    <c:if test="${not empty objectId}">
+    <tag:param name="objectId" value="${objectId}"/>
+    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
+    </c:if>
+</tag:url>
+
 <c:set var="isWritable" value="${isWritable != null ? isWritable : true}"/>
 <c:set var="tableHead">
     <thead>
@@ -68,12 +75,19 @@
                                 <c:if test="${not empty participant.id && not empty modifyUrl}">
                                     <tag:url var="participantModifyUrl" value="${modifyUrl}">
                                         <tag:param name="participantId" value="${participant.id}"/>
+                                        <c:if test="${not empty objectId}">
+                                        <tag:param name="objectId" value="${objectId}"/>
+                                        <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
+                                        </c:if>
                                     </tag:url>
                                     <tag:listAction code="modify" url="${participantModifyUrl}" tabindex="2"/>
                                 </c:if>
                                 <c:if test="${not empty participant.id && not empty deleteUrl}">
                                     <tag:url var="participantDeleteUrl" value="${deleteUrl}">
                                         <tag:param name="participantId" value="${participant.id}"/>
+                                        <c:if test="${not empty objectId}">
+                                        <tag:param name="objectId" value="${objectId}"/>
+                                        </c:if>
                                     </tag:url>
                                     <tag:listAction code="delete" url="${participantDeleteUrl}" tabindex="2"/>
                                 </c:if>
@@ -88,7 +102,7 @@
             </table>
             <c:if test="${isWritable && createUrl != null}">
                 <div class="table-actions">
-                    <a class="btn btn-primary" href="<tag:url var="createUrlTag" value="${createUrl}"></tag:url>">
+                    <a class="btn btn-primary" href="${createUrlTag}">
                         <spring:message code="views.button.add"/>
                     </a>
                 </div>
@@ -99,9 +113,16 @@
         <c:when test="${dataUrl != null}">
             <tag:url var="participantModifyUrl" value="${modifyUrl}">
                 <tag:param name="participantId" value="{{participant.id}}" escape="false"/>
+                <c:if test="${not empty objectId}">
+                <tag:param name="objectId" value="${objectId}"/>
+                <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
+                </c:if>
             </tag:url>
             <tag:url var="participantDeleteUrl" value="${deleteUrl}">
                 <tag:param name="participantId" value="{{participant.id}}" escape="false"/>
+                <c:if test="${not empty objectId}">
+                <tag:param name="objectId" value="${objectId}"/>
+                </c:if>
             </tag:url>
             <div ng-controller="PaginationController"
                  ng-init="init('participants', '${dataUrl}', {${dataUrlParameters}})">
@@ -146,7 +167,7 @@
                 </table>
                 <c:if test="${isWritable && createUrl != null}">
                     <div class="table-actions">
-                        <a class="btn btn-primary" href="<tag:url var="createUrlTag" value="${createUrl}"></tag:url>" tabindex="1">
+                        <a class="btn btn-primary" href="${createUrlTag}" tabindex="1">
                             <spring:message code="views.button.add"/>
                         </a>
                     </div>

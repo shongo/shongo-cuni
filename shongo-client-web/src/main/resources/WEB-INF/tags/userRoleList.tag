@@ -13,6 +13,7 @@
 <%@attribute name="dataUrlParameters" required="false" %>
 <%@attribute name="createUrl" required="false" %>
 <%@attribute name="deleteUrl" required="false" %>
+<%@attribute name="objectUrl" required="false" %>
 
 <c:set var="isWritable" value="${isWritable != null ? isWritable : true}"/>
 <c:set var="tableHead">
@@ -67,6 +68,12 @@
    }
 </script>
 
+<tag:url var="createUrlTag" value="${createUrl}">
+    <c:if test="${not empty objectId}">
+    <tag:param name="objectId" value="${objectId}"/>
+    <tag:param name="back-url" value="{{requestUrl}}" escape="false"/>
+    </c:if>
+</tag:url>
 <div class="tagUserRoleList">
 <c:choose>
     <%-- Static list of user roles --%>
@@ -77,6 +84,9 @@
             <tbody>
             <c:forEach items="${data}" var="userRole">
                 <tag:url var="userRoleDeleteUrl" value="${deleteUrl}">
+                    <c:if test="${not empty objectId}">
+                    <tag:param name="objectId" value="${objectId}"/>
+                    </c:if>
                     <tag:param name="roleId" value="${userRole.id}"/>
                 </tag:url>
                 <tr ng-controller="UserRoleController">
@@ -116,7 +126,6 @@
             </c:if>
             </tbody>
         </table>
-        <tag:url var="createUrlTag" value="${createUrl}"></tag:url>
         <c:if test="${isWritable && createUrl != null}">
             <div class="table-actions">
                 <a class="btn btn-primary" href="${createUrlTag}">
@@ -130,6 +139,9 @@
     <c:when test="${dataUrl != null}">
         <tag:url var="userRoleDeleteUrl" value="${deleteUrl}">
             <tag:param name="roleId" value="{{userRole.id}}" escape="false"/>
+            <c:if test="${not empty objectId}">
+            <tag:param name="objectId" value="${objectId}"/>
+            </c:if>
         </tag:url>
         <div ng-controller="PaginationController"
              ng-init="init('userRoles', '${dataUrl}', {${dataUrlParameters}})">
@@ -173,7 +185,7 @@
             </table>
             <c:if test="${isWritable && createUrl != null}">
                 <div class="table-actions">
-                    <a class="btn btn-primary" href="${createUrl}" tabindex="1">
+                    <a class="btn btn-primary" href="${createUrlTag}" tabindex="1">
                         <spring:message code="views.button.add"/>
                     </a>
                 </div>
