@@ -13,6 +13,11 @@
 <tag:url var="cancelUrl" value="${requestScope.backUrl}"/>
 <tag:url var="webServiceDataUrl" value="<%= ClientWebUrl.USER_SETTINGS_WEB_SERVICE_DATA %>"/>
 
+<c:set var="currentTimeZone" value="${userSettings.currentTimeZone}"/>
+<c:if test="${empty currentTimeZone}">
+    <c:set var="currentTimeZone" value="UTC"/>
+</c:if>
+
 <%--
 Alternative: https://einfra.cesnet.cz/perun-gui/#usr/info?active=1
 --%>
@@ -46,10 +51,6 @@ Alternative: https://einfra.cesnet.cz/perun-gui/#usr/info?active=1
     });
 </script>
 
-<c:set var="currentTimeZone" value="${userSettings.currentTimeZone}"/>
-<c:if test="${empty currentTimeZone}">
-    <c:set var="currentTimeZone" value="UTC"/>
-</c:if>
 
 <form:form class="form-horizontal" role="form" method="post" commandName="userSettings"
            ng-app="jsp:userSettings" ng-controller="UserSettingsController">

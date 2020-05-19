@@ -36,6 +36,7 @@
                 <p><spring:message code="views.userRole.objectRoleHelp.READER"/></p>
             </tag:help>
         </th>
+        <th><spring:message code="views.userRole.userId"/></th>
         <th><spring:message code="views.userRole.email"/></th>
         <c:if test="${isWritable && not empty deleteUrl}">
             <th style="min-width: 85px; width: 85px;">
@@ -111,6 +112,7 @@
                         </c:choose>
                     </td>
                     <td><spring:message code="views.userRole.objectRole.${userRole.role}"/></td>
+                    <td>${userRole.user.userId}</td>
                     <td>${userRole.user.primaryEmail}</td>
                     <c:if test="${isWritable && not empty userRoleDeleteUrl}">
                         <td>
@@ -171,6 +173,7 @@
                         </span>
                     </td>
                     <td>{{userRole.role}}</td>
+                    <td>{{userRole.identityPrincipalId}}</td>
                     <td>{{userRole.email}}</td>
                     <c:if test="${isWritable && not empty userRoleDeleteUrl}">
                         <td>

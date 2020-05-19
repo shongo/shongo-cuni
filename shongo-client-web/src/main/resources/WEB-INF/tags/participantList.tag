@@ -25,7 +25,7 @@
 <c:set var="tableHead">
     <thead>
     <tr>
-        <th><spring:message code="views.participant.userId"/></th>
+        <th><spring:message code="views.participant.user"/></th>
         <c:if test="${!hideRole}">
             <th>
                 <spring:message code="views.participant.role"/>
@@ -38,6 +38,7 @@
                 </tag:help>
             </th>
         </c:if>
+        <th><spring:message code="views.participant.userId"/></th>
         <th><spring:message code="views.participant.email"/></th>
         <c:if test="${isWritable && (not empty modifyUrl || not empty deleteUrl)}">
             <th style="min-width: 85px; width: 85px;">
@@ -69,6 +70,7 @@
                         <c:if test="${!hideRole}">
                             <td><spring:message code="views.participant.role.${participant.role}"/></td>
                         </c:if>
+                        <td>${participant.user.userId}</td>
                         <td>${participant.email}</td>
                         <c:if test="${isWritable && (not empty modifyUrl || not empty deleteUrl)}">
                             <td>
@@ -146,6 +148,7 @@
                         <c:if test="${!hideRole}">
                             <td>{{participant.role}}</td>
                         </c:if>
+                        <td>{{participant.userId}}</td>
                         <td>{{participant.email}}</td>
                         <c:if test="${isWritable && (not empty modifyUrl || not empty deleteUrl)}">
                             <td>

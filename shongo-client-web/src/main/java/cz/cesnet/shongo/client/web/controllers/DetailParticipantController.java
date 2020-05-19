@@ -110,6 +110,7 @@ public class DetailParticipantController extends AbstractDetailController
             UserInformation userInformation = participantModel.getUser();
             if (userInformation != null) {
                 item.put("organization", userInformation.getOrganization());
+                item.put("userId", userInformation.getUserId());
             }
             item.put("role", messageSource.getMessage(
                     "views.participant.role." + participantModel.getRole(), null, locale));
