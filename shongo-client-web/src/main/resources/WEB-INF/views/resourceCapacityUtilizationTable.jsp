@@ -6,7 +6,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="tag" uri="/WEB-INF/client-web.tld" %>
-
+<c:set var="administrationMode" value="${sessionScope.SHONGO_USER.administrationMode}"/>
 <div style="overflow: auto;">
 <table class="table table-striped table-hover">
     <thead>
@@ -34,10 +34,17 @@
                     </tag:url>
                     <spring:message var="valueMaximum" code="views.resourceCapacityUtilization.value.maximum"/>
                     <spring:message var="valueAverage" code="views.resourceCapacityUtilization.value.average"/>
-                    <a class="maximum" href="${resourceCapacityUtilizationDescriptionUrl}" target="_blank" title="${valueMaximum}">
-                        ${resourceCapacity.formatUtilization(utilization, 'MAXIMUM', style)}<c:if test="${style == 'ABSOLUTE'}">/${resourceCapacity.licenseCount}</c:if>
-                    </a>
-                    <span title="${valueAverage}">(${resourceCapacity.formatUtilization(utilization, 'AVERAGE', style)})</span>
+                    <c:choose>
+                        <c:when test="${administrationMode}">
+                            <a class="maximum" href="${resourceCapacityUtilizationDescriptionUrl}" target="_blank" title="${valueMaximum}">
+                                    ${resourceCapacity.formatUtilization(utilization, 'MAXIMUM', style)}<c:if test="${style == 'ABSOLUTE'}">/${resourceCapacity.licenseCount}</c:if>
+                            </a>
+                            <span title="${valueAverage}">(${resourceCapacity.formatUtilization(utilization, 'AVERAGE', style)})</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span style="width:100%;height:100%;" class="maximum" title="${valueMaximum}">(${resourceCapacity.formatUtilization(utilization, 'MAXIMUM', style)})</span>
+                        </c:otherwise>
+                    </c:choose>
                 </td>
             </c:forEach>
             <td></td>
