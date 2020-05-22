@@ -135,7 +135,7 @@
 
     <div class="form-group" ng-show="type == 'USER'">
         <form:label class="col-xs-2 control-label" path="userId">
-            <spring:message code="views.participant.userId"/>:
+            <spring:message code="views.participant.user"/>:
         </form:label>
         <div class="col-xs-4">
             <form:input cssClass="form-control" cssErrorClass="form-control error" path="userId" tabindex="${tabIndex}"/>
