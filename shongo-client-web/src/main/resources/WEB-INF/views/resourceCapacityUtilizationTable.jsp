@@ -23,7 +23,7 @@
     <tbody>
     <c:forEach items="${resourceCapacityUtilization}" var="entry">
         <tr>
-            <td style="min-width: 250px;"><tag:format value="${entry.key}" style="date"/></td>
+            <td style="min-width: 250px;"><tag:format value="${entry.key}" /></td>
             <c:forEach items="${resourceCapacitySet}" var="resourceCapacity">
                 <c:set var="utilization" value="${entry.value.get(resourceCapacity)}"/>
                 <td style="width: 150px;" class="${resourceCapacity.getCssClass(utilization)}">

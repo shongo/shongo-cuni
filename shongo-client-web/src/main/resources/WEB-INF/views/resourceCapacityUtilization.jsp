@@ -19,6 +19,10 @@
         $scope.dateTimeAdd = function(dateTime, period, periodCount) {
             periodCount = (periodCount != null ? periodCount : 1);
             switch (period) {
+                case "PT1H": {
+                    dateTime.add("hours", periodCount);
+                    break;
+                }
                 case "P1D": {
                     dateTime.add("days", periodCount);
                     break;
@@ -47,6 +51,12 @@
                 text += count + " ";
             }
             switch (period) {
+                case "PT1H": {
+                    if (typeof(count) == "boolean" && count == true) { return text + "<spring:message code="views.period.hours"/>"; }
+                    else if (count > 1 && count <= 4)                { return text + "<spring:message code="views.period.hours4"/>"; }
+                    else if (count > 4)                              { return text + "<spring:message code="views.period.hoursN"/>"; }
+                    else                                             { return text + "<spring:message code="views.period.hour"/>"; }
+                }
                 case "P1D": {
                     if (typeof(count) == "boolean" && count == true) { return text + "<spring:message code="views.period.days"/>"; }
                     else if (count > 1 && count <= 4)                { return text + "<spring:message code="views.period.days4"/>"; }
@@ -128,17 +138,31 @@
         // Update changes in configuration
         $scope.$watch("period", function(){
             // Update end
-            var end = $scope.dateTimeAdd(moment($scope.start), $scope.period, $scope.periodCount);
-            $scope.end = $scope.dateTimeAdd(end, "P1D", - 1).format("YYYY-MM-DD");
+            if ($scope.period == "PT1H") {
+                $scope.periodCount = 24;
+                $scope.end = $scope.start;
+            } else if ($scope.period == "P1D") {
+                $scope.periodCount = 7;
+                var end = $scope.dateTimeAdd(moment($scope.start), $scope.period, $scope.periodCount);
+                $scope.end = $scope.dateTimeAdd(end, "P1D", - 1).format("YYYY-MM-DD");
+            } else {
+                var end = $scope.dateTimeAdd(moment($scope.start), $scope.period, $scope.periodCount);
+                $scope.end = $scope.dateTimeAdd(end, "P1D", - 1).format("YYYY-MM-DD");
+            }
         });
         $scope.$watch("[start,end]", function(){
             // Update period count
             var start = moment($scope.start);
             var end = moment($scope.end);
             if (start > end) {
-                $scope.end = $scope.dateTimeAdd(start, $scope.period, $scope.periodCount).format("YYYY-MM-DD")
-            }
-            else {
+                if ($scope.period == "PT1H") {
+                    $scope.end = $scope.dateTimeAdd(start, $scope.period, $scope.periodCount - 1).format("YYYY-MM-DD");
+                } else {
+                    $scope.end = $scope.dateTimeAdd(start, $scope.period, $scope.periodCount).format("YYYY-MM-DD");
+                }
+            } else if ($scope.period == "PT1H") {
+                $scope.periodCount = 24;
+            } else {
                 $scope.periodCount = 0;
                 if ($scope.period == "P1D") {
                     $scope.periodCount++;
@@ -169,7 +193,7 @@
         <label for="period"><spring:message code="views.resourceCapacityUtilization.units"/>:</label>
         &nbsp;
         <select id="period" class="form-control" tabindex="${tabIndex}" ng-model="period">
-            <c:forEach var="period" items="P1D,P1W,P1M,P1Y">
+            <c:forEach var="period" items="PT1H,P1D,P1W,P1M,P1Y">
                 <option value="${period}">{{formatFirstUpper(formatPeriod("${period}", true))}}</option>
             </c:forEach>
         </select>
@@ -199,14 +223,14 @@
                 <a class="btn btn-default" href="" ng-click="moveStart(-periodCount)" title="{{formatPeriod(period, periodCount)}} ${backward}">&lt;&lt;&lt;</a>
                 <a class="btn btn-default" href="" ng-click="moveStart(periodCount)" title="{{formatPeriod(period, periodCount)}} ${forward}">&gt;&gt;&gt;</a>
             </div>
-            <div class="btn-group-divided">
+<%--            <div class="btn-group-divided">
                 <a class="btn btn-default" href="" ng-click="moveStart(-floor(periodCount / 2))" title="{{formatPeriod(period, floor(periodCount / 2))}} ${backward}">&lt;&lt;</a>
                 <a class="btn btn-default" href="" ng-click="moveStart(floor(periodCount / 2))" title="{{formatPeriod(period, floor(periodCount / 2))}} ${forward}">&gt;&gt;</a>
             </div>
             <div class="btn-group-divided">
                 <a class="btn btn-default" href="" ng-click="moveStart(-1)" title="{{formatPeriod(period, 1)}} ${backward}">&lt;</a>
                 <a class="btn btn-default" href="" ng-click="moveStart(1)" title="{{formatPeriod(period, 1)}} ${forward}">&gt;</a>
-            </div>
+            </div>--%>
         </div>
     </form>
     <form class="form-inline" style="padding-top: 10px;">
