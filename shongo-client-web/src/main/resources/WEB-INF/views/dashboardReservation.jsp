@@ -351,8 +351,8 @@
                 <th>
                     <pagination-sort column="REUSED_RESERVATION_REQUEST"><spring:message code="views.reservationRequest.type"/></pagination-sort><%--
                     --%><tag:help selectable="true" width="800px">
-                    <h1><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></h1>
-                    <p><spring:message code="views.help.roomType.ADHOC_ROOM.description"/></p>
+<%--                    <h1><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></h1>
+                    <p><spring:message code="views.help.roomType.ADHOC_ROOM.description"/></p>--%>
                     <h1><spring:message code="views.reservationRequest.specification.PERMANENT_ROOM"/></h1>
                     <p><spring:message code="views.help.roomType.PERMANENT_ROOM.description"/></p>
                     <a class="btn btn-success" href="${helpUrl}#rooms" target="_blank">
