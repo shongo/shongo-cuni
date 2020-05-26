@@ -1217,7 +1217,7 @@
             </div>
         </div>
 
-        <div class="form-group" ng-show="technology == 'ADOBE_CONNECT' || technology == 'FREEPBX'" class="hide">
+<%--        <div class="form-group" ng-show="technology == 'ADOBE_CONNECT' || technology == 'FREEPBX'" class="hide">
             <form:label class="col-xs-3 control-label" path="roomPin">
                 <spring:message code="views.reservationRequest.specification.roomPin" var="pinLabel"/>
                 <tag:help label="${pinLabel}:">
@@ -1232,7 +1232,7 @@
             <div class="col-xs-offset-3 col-xs-9">
                 <form:errors path="roomPin" cssClass="error"/>
             </div>
-        </div>
+        </div>--%>
     </c:if>
 
     <%-- TODO: Check if resource has recording capability --%>
