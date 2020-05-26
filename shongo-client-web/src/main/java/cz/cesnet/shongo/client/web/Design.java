@@ -664,7 +664,7 @@ public class Design
             if (isUserAuthenticated()) {
                 final UserContext user = getUser();
 
-                if (cache.hasUserPermission(user.securityToken, UserPermission.RESOURCE_MANAGEMENT)) {
+                if (cache.hasUserPermission(user.securityToken, UserPermission.ADMINISTRATION)) {
                     links.add(new LinkSeparatorContext());
                     links.add(new LinkContext("navigation.resourceManagement", new LinkedList<LinkContext>(){{
                         add(new LinkContext("navigation.resourceCapacityUtilization",

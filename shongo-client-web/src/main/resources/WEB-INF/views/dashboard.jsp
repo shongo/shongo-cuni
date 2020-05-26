@@ -10,7 +10,7 @@
 <c:set var="advancedUserInterface" value="${sessionScope.SHONGO_USER.advancedUserInterface}"/>
 
 <tag:url var="createMeetingRoomUrl" value="<%= ClientWebUrl.WIZARD_MEETING_ROOM_BOOK %>" />
-
+<tag:url var="viewResourceCapacityUtilization" value="<%= ClientWebUrl.RESOURCE_CAPACITY_UTILIZATION %>" />
 <tag:url var="reservationRequestMultipleDeleteUrl" value="<%= ClientWebUrl.RESERVATION_REQUEST_DELETE %>" />
 
 <script type="text/javascript">
@@ -108,6 +108,11 @@
                         </a>
                     </li>
                 </c:if>
+                <li>
+                    <a href="${viewResourceCapacityUtilization}" tabindex="1">
+                        <spring:message code="views.index.action.viewResourceCapacityUtilization"/>
+                    </a>
+                </li>
             </ul>
         </tag:expandableBlock>
     </security:authorize>
