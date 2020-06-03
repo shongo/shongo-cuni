@@ -30,6 +30,6 @@
 </script>
 
 <div ng-controller="ReservationRequestStateController">
-    <tag:url var="detailUrl" value="<%= ClientWebUrl.DETAIL_VIEW %>"/>
+    <c:set var="detailUrl" value="<%= ClientWebUrl.DETAIL_VIEW %>"/>
     <tag:reservationRequestDetail reservationRequest="${reservationRequest}" detailUrl="${detailUrl}"/>
 </div>

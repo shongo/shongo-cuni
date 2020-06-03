@@ -12,13 +12,19 @@
 <script type="text/javascript">
     var module = angular.provideModule('tag:reservationRequestChildren', ['ngPagination', 'ngSanitize']);
     function RefreshController($scope, $timeout) {
-        // Period for refreshing empty list
+        // Period for first list refreshing
         $scope.refreshTimeout = 5;
-        // Number of refreshes for empty list
+        // Number of refreshes for list
         $scope.refreshCount = 5;
         // After data is set
         $scope.$parent.onSetData = function(data) {
-            if (data.length == 0 && $scope.refreshCount-- > 0) {
+            $scope.$parent.refreshing = true;
+            if (data.length == 0 && $scope.refreshCount > 0 || $scope.refreshCount > 4) {
+                $scope.refreshCount--;
+                if ($scope.refreshCount == 3) {
+                    // Slow refreshing
+                    $scope.refreshTimeout = 5;
+                }
                 if ($scope.timeout != null) {
                     $timeout.cancel($scope.timeout);
                 }
@@ -26,8 +32,10 @@
                     $scope.timeout = null;
                     $scope.$parent.refresh();
                 }, $scope.refreshTimeout * 1000);
+
             }
             else {
+                $scope.$parent.refreshing = false;
                 $scope.$parent.onSetData = null;
             }
         };
@@ -59,7 +67,7 @@
     <pagination-page-size class="pull-right" unlimited="${paginationRecordsAll}" refresh="${paginationRefresh}">
         <spring:message code="views.pagination.records"/>
     </pagination-page-size>
-    <h2><spring:message code="views.reservationRequestDetail.children"/></h2>
+    <h2><spring:message code="views.reservationRequestDetail.children"/><img style="margin-left: 10px;" width="10" height="10" title="" alt="" src="data:image/gif;base64,R0lGODlhCgAKALMIAP7+/uDg4MzMzL29vbCwsJycnI2NjXx8fP4BAgAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFBwAIACwAAAAACgAKAAAELxChUM4pQaJh+xnTYRwAwB2UAYxGwFUBEFiqt1rxXA0Bu2KWQUmE2niCGooFI4kAACH5BAUHAAgALAEAAQAIAAgAAAQaEElkJiKhCklQsMiBDCBIitbXIZsRrFIFSBEAIfkEBQcACAAsAQABAAgACAAABB8QIUOOlAKMMtHJFSJIgWGQ6GQEmEeI1lkMwHgdxIlEACH5BAUHAAgALAIAAQAGAAgAAAQZEI2JkAlgGBkCEhUCVMCIHCHoDdYABJtERQAh+QQFBwAIACwCAAEABgAIAAAEFxAdhIwUCIiJCDEEII1k9nnUIYhblSIRACH5BAUHAAgALAIAAQAGAAgAAAQZEKFDihwSEIGMGIYkDpjYDUIoEMAlFcQhRQAh+QQFBwAIACwBAAEACAAIAAAEGhBJdIyZKOSBUQHApSHWIVVXRoJFN2ijVGIRACH5BAUHAAgALAEAAQAIAAgAAAQgEEl5jjQCBVEMGleAdJUkAMMAZEhlFJr3Ia8gCnI5IREAIfkEBQcACAAsAQACAAgABgAABBkQHQTAOMeYgrpAA8BNiPBJSGGVXaphIYBGADs=" ng-if="refreshing" /></h2>
     <div class="spinner" ng-hide="ready || errorContent"></div>
     <span ng-controller="HtmlController" ng-show="errorContent" ng-bind-html="html(errorContent)"></span>
     <table class="table table-striped table-hover" ng-show="ready">
