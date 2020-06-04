@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -118,9 +120,9 @@ public class IndexController
      */
     @RequestMapping(value = ClientWebUrl.HELP, method = RequestMethod.GET)
     @IgnoreDateTimeZone
-    public String handleHelpView()
+    public View handleHelpView()
     {
-        return "help";
+        return new RedirectView("https://dl.cuni.cz/adobe-connect/rezervace/", false);
     }
 
     /**

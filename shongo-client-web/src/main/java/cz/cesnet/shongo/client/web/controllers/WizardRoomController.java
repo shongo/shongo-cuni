@@ -347,7 +347,7 @@ public class WizardRoomController extends WizardParticipantsController
         dataBinder.setConversionService(new DefaultFormattingConversionService());
         BindingResult bindingResult = dataBinder.getBindingResult();
 
-        return handleRoomAttributesProcess(userSession, securityToken, sessionStatus, false, false, reservationRequestModel, bindingResult);
+        return handleRoomAttributesProcess(userSession, securityToken, sessionStatus, true, false, reservationRequestModel, bindingResult);
     }
 
     /**

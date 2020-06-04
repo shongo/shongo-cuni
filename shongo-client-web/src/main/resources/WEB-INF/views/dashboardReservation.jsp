@@ -253,7 +253,7 @@
                             </span>
                             <select class="form-control" ng-model="reservationList.specificationType" style="width: 190px;">
                                 <option value=""><spring:message code="views.reservationRequest.specification.all"/></option>
-                                <option value="ADHOC_ROOM"><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></option>
+                                <%--<option value="ADHOC_ROOM"><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></option>--%>
                                 <option value="PERMANENT_ROOM"><spring:message code="views.reservationRequest.specification.PERMANENT_ROOM"/></option>
                             </select>
                         </div>
@@ -263,7 +263,7 @@
                             </span>
                             <select class="form-control" ng-model="reservationList.specificationTechnology" style="width: 150px;">
                                 <option value=""><spring:message code="views.reservationRequest.technology.all"/></option>
-                                <spring:eval var="technologies" expression="T(cz.cesnet.shongo.client.web.models.TechnologyModel).values()"/>
+                                <spring:eval var="technologies" expression="new cz.cesnet.shongo.client.web.models.TechnologyModel[] {T(cz.cesnet.shongo.client.web.models.TechnologyModel).ADOBE_CONNECT}"/>
                                 <c:forEach var="technology" items="${technologies}">
                                     <option value="${technology}"><spring:message code="${technology.titleCode}"/></option>
                                 </c:forEach>
@@ -349,16 +349,16 @@
                     </th>
                 </c:if>
                 <th>
-                    <pagination-sort column="REUSED_RESERVATION_REQUEST"><spring:message code="views.reservationRequest.type"/></pagination-sort><%--
-                    --%><tag:help selectable="true" width="800px">
-<%--                    <h1><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></h1>
-                    <p><spring:message code="views.help.roomType.ADHOC_ROOM.description"/></p>--%>
+                    <pagination-sort column="REUSED_RESERVATION_REQUEST"><spring:message code="views.reservationRequest.type"/></pagination-sort>
+<%--                    <tag:help selectable="true" width="800px">
+                    <h1><spring:message code="views.reservationRequest.specification.ADHOC_ROOM"/></h1>
+                    <p><spring:message code="views.help.roomType.ADHOC_ROOM.description"/></p>
                     <h1><spring:message code="views.reservationRequest.specification.PERMANENT_ROOM"/></h1>
                     <p><spring:message code="views.help.roomType.PERMANENT_ROOM.description"/></p>
                     <a class="btn btn-success" href="${helpUrl}#rooms" target="_blank">
                         <spring:message code="views.help.rooms.display"/>
                     </a>
-                    </tag:help>
+                    </tag:help>--%>
                 </th>
                 <th>
                     <pagination-sort column="ALIAS_ROOM_NAME"><spring:message code="views.reservationRequestList.roomName"/></pagination-sort>

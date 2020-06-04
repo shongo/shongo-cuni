@@ -453,7 +453,7 @@ paginationModule.directive('paginationPageSize', function () {
                 optionUnlimited +
                 '</select>' +
                 '</span>' +
-                remove + removeAll + refresh +
+                remove /*+ removeAll*/ + refresh +
                 '</div>';
             element.replaceWith(html);
         }

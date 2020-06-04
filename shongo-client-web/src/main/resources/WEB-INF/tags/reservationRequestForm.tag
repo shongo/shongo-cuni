@@ -555,7 +555,7 @@
 
     <c:choose>
         <c:when test="${reservationRequest.specificationType != 'MEETING_ROOM' && reservationRequest.specificationType != 'PERMANENT_ROOM_CAPACITY'}">
-            <div class="form-group">
+            <div class="form-group" ng-hide="true">
                 <form:label class="col-xs-3 control-label" path="technology">
                     <spring:message code="views.reservationRequest.technology"/>:
                 </form:label>
@@ -688,10 +688,10 @@
                     {{option}}
                 </form:select>
                 <form:errors path="permanentRoomReservationRequestId" cssClass="error"/>
-                <div ng-show="permanentRoom" class="description">
+<%--                <div ng-show="permanentRoom" class="description">
                     <b><spring:message code="views.reservationRequest.validity"/>:</b>
                     {{permanentRoom.formattedSlot}}
-                </div>
+                </div>--%>
             </div>
         </div>
     </c:if>
@@ -849,7 +849,7 @@
         </div>
     </c:if>
 
-    <div class="form-group">
+    <div class="form-group" ng-hide="'${reservationRequest.specificationType}' == 'PERMANENT_ROOM'">
         <label class="col-xs-3 control-label" path="start">
             <spring:message code="views.reservationRequest.start"/>:
         </label>

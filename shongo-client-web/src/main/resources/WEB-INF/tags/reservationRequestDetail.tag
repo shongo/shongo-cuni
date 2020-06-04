@@ -164,8 +164,11 @@
             <dd><tag:format value="${reservationRequest.detail.room.slot}" multiline="true" pre="${reservationRequest.detail.room.slotBefore}" post="${reservationRequest.detail.room.slotAfter}"/></dd>
         </c:when>
         <c:otherwise>
-            <dt><spring:message code="views.reservationRequest.slot"/>:</dt>
-            <dd><tag:format value="${reservationRequest.firstSlot}" multiline="true"  pre="${reservationRequest.slotBefore}" post="${reservationRequest.slotAfter}"/></dd>
+            <c:if test="${!(reservationRequest.specificationType == 'PERMANENT_ROOM')}">
+                <dt><spring:message code="views.reservationRequest.slot"/>:</dt>
+                <dd><tag:format value="${reservationRequest.firstSlot}" multiline="true"  pre="${reservationRequest.slotBefore}" post="${reservationRequest.slotAfter}"/></dd>
+            </c:if>
+
         </c:otherwise>
     </c:choose>
 
@@ -332,14 +335,14 @@
             </c:if>
         </dd>
 
-        <dt><spring:message code="views.reservationRequest.specification.roomParticipantNotificationEnabled"/>:</dt>
+<%--        <dt><spring:message code="views.reservationRequest.specification.roomParticipantNotificationEnabled"/>:</dt>
         <dd>
             <spring:message code="views.button.${reservationRequest.roomParticipantNotificationEnabled ? 'yes' : 'no'}" var="roomParticipantNotificationEnabled"/>
             <tag:help label="${roomParticipantNotificationEnabled}">
                 <spring:message code="views.reservationRequest.specification.roomParticipantNotificationEnabled.help"/>
             </tag:help>
 
-        </dd>
+        </dd>--%>
     </c:if>
     <c:if test="${reservationRequest.roomParticipantNotificationEnabled}">
         <dt><spring:message code="views.reservationRequest.specification.roomMeetingName"/>:</dt>
