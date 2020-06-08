@@ -696,19 +696,6 @@
         </div>
     </c:if>
 
-    <div class="form-group">
-        <form:label class="col-xs-3 control-label" path="description">
-            <spring:message code="views.reservationRequest.description" var="descriptionLabel"/>
-            <tag:help label="${descriptionLabel}:"><spring:message code="views.reservationRequest.descriptionHelp"/></tag:help>
-        </form:label>
-        <div class="col-xs-4">
-            <form:input path="description" cssClass="form-control" cssErrorClass="form-control error" tabindex="${tabIndex}"/>
-        </div>
-        <div class="col-xs-offset-3 col-xs-9">
-            <form:errors path="description" cssClass="error"/>
-        </div>
-    </div>
-
     <c:if test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
         <div class="form-group">
             <form:label class="col-xs-3 control-label" path="roomName">
@@ -722,6 +709,20 @@
             </div>
         </div>
     </c:if>
+
+    <div class="form-group">
+        <form:label class="col-xs-3 control-label" path="description">
+            <spring:message code="views.reservationRequest.description" var="descriptionLabel"/>
+            <tag:help label="${descriptionLabel}:"><spring:message code="views.reservationRequest.descriptionHelp"/></tag:help>
+        </form:label>
+        <div class="col-xs-4">
+            <form:input path="description" cssClass="form-control" cssErrorClass="form-control error" tabindex="${tabIndex}"/>
+        </div>
+        <div class="col-xs-offset-3 col-xs-9">
+            <form:errors path="description" cssClass="error"/>
+        </div>
+    </div>
+
 
     <%-- Show retaing option H323_E164 number for permanent rooms --%>
     <c:if test="${reservationRequest.specificationType == 'PERMANENT_ROOM'}">
