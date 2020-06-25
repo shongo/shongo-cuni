@@ -423,7 +423,7 @@ public class ServerAuthorization extends Authorization
         Hashtable<String,String> env = new Hashtable <String,String>();
         env.put("com.sun.jndi.ldap.connect.pool", "true");
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_AUTHENTICATION, "ssl");
         env.put(Context.PROVIDER_URL, ldapAuthorizationServer);
         env.put(Context.SECURITY_PRINCIPAL, ldapClientDn);
         env.put(Context.SECURITY_CREDENTIALS, ldapClientSecret);
