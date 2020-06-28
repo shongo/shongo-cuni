@@ -165,13 +165,6 @@ public class ReservationRequestValidator implements Validator
         if (specificationType != null) {
             switch (specificationType) {
                 case PERMANENT_ROOM_CAPACITY:
-                    DateTime start = reservationRequestModel.getRequestStart();
-                    String strDateTime = "01/07/2020 00:00:00";
-                    DateTime dateTime = DateTime.parse(strDateTime, DateTimeFormat.forPattern("dd/MM/yyyy HH:mm:ss"));
-
-                    if (start.isBefore(dateTime)) {
-                        errors.rejectValue("startDate", "validation.field.reservationsStartAllowance");
-                    }
                     ValidationUtils.rejectIfEmptyOrWhitespace(
                             errors, "permanentRoomReservationRequestId", "validation.field.required");
                 case ADHOC_ROOM:
