@@ -35,6 +35,7 @@ import javax.persistence.EntityManagerFactory;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.rmi.Naming;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -423,7 +424,6 @@ public class ServerAuthorization extends Authorization
         Hashtable<String,String> env = new Hashtable <String,String>();
         env.put("com.sun.jndi.ldap.connect.pool", "true");
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_PROTOCOL, "ssl");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.PROVIDER_URL, ldapAuthorizationServer);
         env.put(Context.SECURITY_PRINCIPAL, ldapClientDn);
@@ -438,17 +438,34 @@ public class ServerAuthorization extends Authorization
      */
     private UserData createUserDataFromLdapData(Attributes attributes) throws NamingException {
 
-        // Required fields
-        if (attributes.get("uid") == null) {
-            throw new IllegalArgumentException("User data must contain uid.");
-        }
+
         // Ignore if not set
         if (attributes.get("sn") == null || attributes.get("givenname") == null) {
             return null;
         }
 
 
-        String userId = (String) attributes.get("uid").get();
+        String userId = null;
+        NamingEnumeration ne =  attributes.getAll();
+
+        while (userId == null && ne.hasMore()) {
+            Attribute attribute = (Attribute) ne.next();
+            if (attribute.getID().equals("uid")) {
+                NamingEnumeration values = attribute.getAll();
+                while (userId == null && values.hasMore()) {
+                    String value = (String) values.next();
+                    if (value.matches("[0-9]+") && value.length() == 8) {
+                        userId = value;
+                    }
+                }
+            }
+        }
+
+        // Required fields
+        if (userId == null) {
+            throw new IllegalArgumentException("User data must contain valid uid.");
+        }
+
         UserData userData = new UserData();
         UserInformation userInformation = userData.getUserInformation();
         userInformation.setUserId(userId);
