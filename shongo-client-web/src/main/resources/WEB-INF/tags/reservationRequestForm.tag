@@ -702,7 +702,15 @@
                 <spring:message code="views.reservationRequest.specification.roomName"/>:
             </form:label>
             <div class="col-xs-4">
-                <form:input path="roomName" cssClass="form-control" cssErrorClass="form-control error" tabindex="${tabIndex}"/>
+                <c:choose>
+                    <c:when test="${not empty reservationRequest.roomName}">
+                        <form:input path="roomName" readonly="true" cssClass="form-control" cssErrorClass="form-control error" tabindex="${tabIndex}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <form:input path="roomName" cssClass="form-control" cssErrorClass="form-control error" tabindex="${tabIndex}"/>
+                    </c:otherwise>
+                </c:choose>
+
             </div>
             <div class="col-xs-offset-3 col-xs-9">
                 <form:errors path="roomName" cssClass="error"/>

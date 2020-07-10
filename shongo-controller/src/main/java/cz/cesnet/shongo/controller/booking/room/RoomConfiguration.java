@@ -41,7 +41,7 @@ public class RoomConfiguration extends SimplePersistentObject
     /**
      * @return {@link #technologies}
      */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(length = AbstractComplexType.ENUM_COLUMN_LENGTH)
     @Enumerated(EnumType.STRING)
     @Access(AccessType.FIELD)

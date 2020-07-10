@@ -12,6 +12,7 @@ import cz.cesnet.shongo.connector.api.RecordingSettings;
 import cz.cesnet.shongo.connector.api.UsageStats;
 import cz.cesnet.shongo.connector.common.AbstractMultipointConnector;
 import cz.cesnet.shongo.connector.common.RequestAttributeList;
+import cz.cesnet.shongo.controller.api.jade.GetRoom;
 import cz.cesnet.shongo.controller.api.jade.NotifyTarget;
 import cz.cesnet.shongo.controller.api.jade.Service;
 import org.jdom2.Attribute;
@@ -566,13 +567,12 @@ public class AdobeConnectConnector extends AbstractMultipointConnector implement
             room.setId(roomId);
             room.addAlias(AliasType.ROOM_NAME, sco.getChildText("name"));
             room.setDescription(sco.getChildText("description"));
-            if (sco.getChildText("sco-tag") != null) {
-                room.setLicenseCount(Integer.valueOf(sco.getChildText("sco-tag")));
-            }
-            else {
-                logger.warn("Licence count not set for room " + roomId + " (using 0 licenses).");
-                room.setLicenseCount(0);
-            }
+
+            // Setting licences from controller room
+            GetRoom getRoom = new GetRoom();
+            getRoom.setRoomId(roomId);
+            Room controllerRoom = (Room) performControllerAction(getRoom);
+            room.setLicenseCount(controllerRoom.getLicenseCount());
             room.addTechnology(Technology.ADOBE_CONNECT);
 
             String uri = "https://" + deviceAddress + sco.getChildText("url-path");
@@ -795,12 +795,12 @@ public class AdobeConnectConnector extends AbstractMultipointConnector implement
         String roomId = room.getId();
 
         getRoom(roomId);
-        RequestAttributeList attributes = new RequestAttributeList();
+        /*RequestAttributeList attributes = new RequestAttributeList();
         attributes.add("sco-id", roomId);
         attributes.add("type", "meeting");
 
         // Set room attributes
-        setRoomAttributes(attributes, room);
+        setRoomAttributes(attributes, room);*/
 
         // Add/modify participants
         if (room.getLicenseCount() > 0) {
@@ -815,7 +815,7 @@ public class AdobeConnectConnector extends AbstractMultipointConnector implement
             endMeeting(roomId);
         }
 
-        execApi("sco-update", attributes);
+        //execApi("sco-update", attributes);
 
         // Set passcode (pin), since Adobe Connect 9.0
         RequestAttributeList passcodeAttributes = new RequestAttributeList();

@@ -160,6 +160,9 @@
                 text += " " + user.lastName;
             }
             text += "</b>";
+            if ( user.userId != null ) {
+                text += " (" + user.userId + ")";
+            }
             if (user.organization != null) {
                 text += " (" + user.organization + ")";
             }
