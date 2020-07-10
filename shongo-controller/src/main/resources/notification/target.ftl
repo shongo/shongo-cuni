@@ -24,9 +24,9 @@ ${context.message(indent, "target.technologies")}: <#list target.technologies as
 ${context.message(indent, "target.room.name")}: ${target.name}
 </#if>
 <#if (!target.technologies?seq_contains("FREEPBX"))>
-<#if roomRecorded??>
+<#--<#if roomRecorded??>
 ${context.message(indent, "target.room.recorded")}: ${context.message("general." + roomRecorded)}
-</#if>
+</#if>-->
 <#if (target.licenseCount > 0)>
 ${context.message(indent, "target.room.licenseCount")}: ${target.licenseCount}
 </#if>
