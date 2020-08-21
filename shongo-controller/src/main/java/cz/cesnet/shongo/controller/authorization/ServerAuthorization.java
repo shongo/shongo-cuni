@@ -488,7 +488,7 @@ public class ServerAuthorization extends Authorization
             NamingEnumeration namingEnumeration =  attributes.getAll();
             while (namingEnumeration.hasMore()) {
                 Attribute attribute = (Attribute) namingEnumeration.next();
-                if (attribute.getID().startsWith("mailAlternateAddress")) {
+                if (attribute.getID().startsWith("mailAlternateAddress") || attribute.getID().startsWith("cuniAuthorizedMail")) {
                     userInformation.setEmail((String) attribute.get());
                     break;
                 }
