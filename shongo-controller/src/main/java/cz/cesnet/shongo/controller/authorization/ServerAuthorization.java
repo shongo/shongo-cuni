@@ -483,6 +483,16 @@ public class ServerAuthorization extends Authorization
         }*/
         if (attributes.get("mail") != null) {
             userInformation.setEmail((String) attributes.get("mail").get());
+        } else {
+            // Try to get mailAlternateAddress
+            NamingEnumeration namingEnumeration =  attributes.getAll();
+            while (namingEnumeration.hasMore()) {
+                Attribute attribute = (Attribute) namingEnumeration.next();
+                if (attribute.getID().startsWith("mailAlternateAddress")) {
+                    userInformation.setEmail((String) attribute.get());
+                    break;
+                }
+            }
         }
         return userData;
     }
