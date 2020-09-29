@@ -9,6 +9,7 @@ import cz.cesnet.shongo.controller.api.Group;
 import cz.cesnet.shongo.controller.api.SecurityToken;
 import cz.cesnet.shongo.report.ReportRuntimeException;
 import cz.cesnet.shongo.ssl.ConfiguredSSLContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -16,18 +17,17 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.ws.commons.util.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
+import javax.naming.LimitExceededException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
@@ -35,7 +35,6 @@ import javax.persistence.EntityManagerFactory;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.rmi.Naming;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -323,7 +322,11 @@ public class ServerAuthorization extends Authorization
             }
             filter.append(")");
         } else if (search != null) {
-            filter.append("(&(cn;lang-en=*" + search + "*)(uid=*))");
+            if (StringUtils.isNumeric(search)) {
+                filter.append("(uid=*" + search + "*)");
+            } else {
+                filter.append("(&(cn;lang-en=*" + search + "*)(uid=*))");
+            }
         }
 
         try {
@@ -339,6 +342,8 @@ public class ServerAuthorization extends Authorization
                     }
                 }
             }
+        } catch (LimitExceededException exceededException) {
+            logger.warn("LimitExceededException thrown while listing user data from LDAP.");
         } catch (NamingException e) {
             throw new CommonReportSet.UnknownErrorException(e, "Unable to list user data from LDAP.");
         } finally {
