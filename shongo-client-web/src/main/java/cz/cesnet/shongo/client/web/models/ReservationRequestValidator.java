@@ -204,6 +204,8 @@ public class ReservationRequestValidator implements Validator
                     validateIdentifier("roomName", errors);
                         if (TechnologyModel.H323_SIP.equals(reservationRequestModel.getTechnology())) {
                             validateE164Number("e164Number", errors);
+                        } else if (TechnologyModel.ADOBE_CONNECT.equals(reservationRequestModel.getTechnology())) {
+                            validateStartsWithLetter("roomName", errors);
                         }
                     break;
             }
@@ -605,5 +607,13 @@ public class ReservationRequestValidator implements Validator
         if (value.length() > 20) {
             errors.rejectValue(field, "validation.field.lengthTooLong");
         }
+    }
+
+    public static void validateStartsWithLetter(String field, Errors errors) {
+        String value = (String) errors.getFieldValue(field);
+        if (value.length() > 0 && !Character.isLetter(value.charAt(0))) {
+            errors.rejectValue(field, "validation.field.validateName");
+        }
+
     }
 }
