@@ -474,12 +474,24 @@ public class AdobeConnectRecordingManager
         cachedMovedRecordings.add(recordingId);
     }
 
+    public void stopRoomRecording (String roomId) throws CommandException {
+        RequestAttributeList attributes = new RequestAttributeList();
+        attributes.add("sco-id", roomId);
+        Element recordingInfo = connector.execApi("meeting-recorder-activity-info", attributes);
+        if (recordingInfo.getChild("meeting-recorder-activity-info").getChildText("active").equals("true")) {
+            attributes = new RequestAttributeList();
+            attributes.add("sco-id", roomId);
+            attributes.add("active", "false");
+            connector.execApi("meeting-recorder-activity-update", attributes);
+        }
+    }
+
     /**
      * @see cz.cesnet.shongo.connector.api.RecordingService#deleteRecording
      */
     public void deleteRecording(String recordingId) throws CommandException
     {
-        //connector.deleteSCO(recordingId);
+        connector.deleteSCO(recordingId);
     }
 
     /**
